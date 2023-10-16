@@ -20,6 +20,12 @@ Publish configuration files
 php artisan vendor:publish --provider="TomShaw\GoogleApi\Providers\GoogleApiServiceProvider" --tag=config
 ```
 
+Run the migration if you wish to use database token storage
+
+```
+php artisan migrate
+```
+
 ## Requirements
 
 - `Laravel 10` (https://laravel.com/) 
