@@ -29,9 +29,7 @@ final class GoogleMail
 
     public function __construct(GoogleClient $client)
     {
-        if (! $client->getAccessToken()) {
-            $client->createAuthUrl();
-        }
+        $client->initialize();
 
         $this->service = new Gmail($client->client);
 

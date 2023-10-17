@@ -28,84 +28,43 @@ class GoogleClient implements GoogleClientInterface
             throw new GoogleClientException('Unable to load client secrets.');
         }
 
-        $this->client->setAuthConfig(config('google-api.auth_config'));
+        $client->setAuthConfig(config('google-api.auth_config'));
 
-        $this->client->addScope(config('google-api-scopes'));
+        $client->addScope(config('google-api-scopes'));
 
-        $this->client->setApplicationName(config('google-api.application_name'));
+        $client->setApplicationName(config('google-api.application_name'));
 
-        $this->client->setPrompt(config('google-api.prompt'));
+        $client->setPrompt(config('google-api.prompt'));
 
-        $this->client->setApprovalPrompt(config('google-api.approval_prompt'));
+        $client->setApprovalPrompt(config('google-api.approval_prompt'));
 
-        $this->client->setAccessType(config('google-api.access_type'));
+        $client->setAccessType(config('google-api.access_type'));
 
-        $this->client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
+        $client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
+    }
 
+    public function initialize(): GoogleClient
+    {
         $accessToken = $this->getAccessToken();
 
-        if ($accessToken) {
-            if ($accessToken instanceof Collection) {
-                $this->client->setAccessToken($accessToken->toArray());
-            } else {
-                $this->client->setAccessToken($accessToken->makeHidden(['id'])->toArray());
-            }
+        if (! $accessToken) {
+            throw new GoogleClientException('Invalid or missing token.');
+        }
 
-            if ($this->client->isAccessTokenExpired()) {
-                $accessRefreshToken = $this->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-                if (is_array($accessRefreshToken)) {
-                    $this->client->setAccessToken($accessRefreshToken);
-                    $this->setAccessToken($accessRefreshToken);
-                }
+        if ($accessToken instanceof Collection) {
+            $this->client->setAccessToken($accessToken->toArray());
+        } else {
+            $this->client->setAccessToken($accessToken->makeHidden(['id'])->toArray());
+        }
+
+        if ($this->client->isAccessTokenExpired()) {
+            $accessRefreshToken = $this->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+
+            if (is_array($accessRefreshToken)) {
+                $this->client->setAccessToken($accessRefreshToken);
+                $this->setAccessToken($accessRefreshToken);
             }
         }
-    }
-
-    public function setAuthConfig(string $authConfig): GoogleClient
-    {
-        $this->client->setAuthConfig($authConfig);
-
-        return $this;
-    }
-
-    public function setApplicationName(string $applicationName): GoogleClient
-    {
-        $this->client->setApplicationName($applicationName);
-
-        return $this;
-    }
-
-    public function addScope(array $scopes): GoogleClient
-    {
-        $this->client->addScope($scopes);
-
-        return $this;
-    }
-
-    public function setAccessType(string $accessType = 'offline'): GoogleClient
-    {
-        $this->client->setAccessType($accessType);
-
-        return $this;
-    }
-
-    public function setPrompt(string $prompt = 'none'): GoogleClient
-    {
-        $this->client->setPrompt($prompt);
-
-        return $this;
-    }
-
-    public function setApprovalPrompt(string $approvalPrompt = 'offline'): GoogleClient
-    {
-        $this->client->setApprovalPrompt($approvalPrompt);
-
-        return $this;
-    }
-
-    public function setIncludeGrantedScopes(bool $includeGrantedScopes = true): GoogleClient
-    {
-        $this->client->setPrompt($includeGrantedScopes);
 
         return $this;
     }

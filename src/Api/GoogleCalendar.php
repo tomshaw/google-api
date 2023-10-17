@@ -16,9 +16,7 @@ final class GoogleCalendar
 
     public function __construct(GoogleClient $client)
     {
-        if (! $client->getAccessToken()) {
-            $client->createAuthUrl();
-        }
+        $client->initialize();
 
         $this->service = new Calendar($client->client);
     }
