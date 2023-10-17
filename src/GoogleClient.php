@@ -12,8 +12,6 @@ use TomShaw\GoogleApi\Resources\AccessTokenResource;
 
 class GoogleClient implements GoogleClientInterface
 {
-    protected Client $client;
-
     public static $rules = [
         'access_token' => 'required|string',
         'refresh_token' => 'required|string',
@@ -23,17 +21,16 @@ class GoogleClient implements GoogleClientInterface
         'created' => 'required|numeric',
     ];
 
-    public function __construct()
-    {
+    public function __construct(
+        public Client $client
+    ) {
         if (! file_exists(config('google-api.auth_config'))) {
             throw new GoogleClientException('Unable to load client secrets.');
         }
 
-        $this->client = new Client();
-
         $this->client->setAuthConfig(config('google-api.auth_config'));
 
-        $this->client->addScope(config('google-api.scopes'));
+        $this->client->addScope(config('google-api-scopes'));
 
         $this->client->setApplicationName(config('google-api.application_name'));
 
@@ -64,9 +61,53 @@ class GoogleClient implements GoogleClientInterface
         }
     }
 
-    public function getClient(): Client
+    public function setAuthConfig(string $authConfig): GoogleClient
     {
-        return $this->client;
+        $this->client->setAuthConfig($authConfig);
+
+        return $this;
+    }
+
+    public function setApplicationName(string $applicationName): GoogleClient
+    {
+        $this->client->setApplicationName($applicationName);
+
+        return $this;
+    }
+
+    public function addScope(array $scopes): GoogleClient
+    {
+        $this->client->addScope($scopes);
+
+        return $this;
+    }
+
+    public function setAccessType(string $accessType = 'offline'): GoogleClient
+    {
+        $this->client->setAccessType($accessType);
+
+        return $this;
+    }
+
+    public function setPrompt(string $prompt = 'none'): GoogleClient
+    {
+        $this->client->setPrompt($prompt);
+
+        return $this;
+    }
+
+    public function setApprovalPrompt(string $approvalPrompt = 'offline'): GoogleClient
+    {
+        $this->client->setApprovalPrompt($approvalPrompt);
+
+        return $this;
+    }
+
+    public function setIncludeGrantedScopes(bool $includeGrantedScopes = true): GoogleClient
+    {
+        $this->client->setPrompt($includeGrantedScopes);
+
+        return $this;
     }
 
     public function createAuthUrl(): void

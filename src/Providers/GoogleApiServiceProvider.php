@@ -2,6 +2,7 @@
 
 namespace TomShaw\GoogleApi\Providers;
 
+use Google\Client;
 use Illuminate\Support\ServiceProvider;
 use TomShaw\GoogleApi\Contracts\GoogleClientInterface;
 use TomShaw\GoogleApi\GoogleClient;
@@ -22,9 +23,9 @@ class GoogleApiServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'google-api');
-        $this->mergeConfigFrom(__DIR__.'/../../config/scopes.php', 'google-api.scopes');
-        $this->mergeConfigFrom(__DIR__.'/../../config/service.php', 'google-api.service');
+        $this->mergeConfigFrom(__DIR__.'/../../config/scopes.php', 'google-api-scopes');
+        $this->mergeConfigFrom(__DIR__.'/../../config/service.php', 'google-api-service');
 
-        $this->app->bind(GoogleClientInterface::class, GoogleClient::class);
+        $this->app->bind(GoogleClientInterface::class, fn () => new GoogleClient(new Client()));
     }
 }

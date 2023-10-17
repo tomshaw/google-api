@@ -20,12 +20,12 @@ final class GoogleCalendar
             $client->createAuthUrl();
         }
 
-        $this->service = new Calendar($client->getClient());
+        $this->service = new Calendar($client->client);
     }
 
     public function listEvents(int $maxResults = 10, string $orderBy = 'startTime', bool $singleEvents = true)
     {
-        $calendarId = config('google-api.service.calendar.owner.email');
+        $calendarId = config('google-api-service.calendar.owner.email');
 
         $options = [
             'maxResults' => $maxResults,
@@ -54,7 +54,7 @@ final class GoogleCalendar
         $end->setDateTime($this->date3339($to));
         $event->setEnd($end);
 
-        $calendarId = config('google-api.service.calendar.owner.email');
+        $calendarId = config('google-api-service.calendar.owner.email');
 
         $insert = $this->service->events->insert($calendarId, $event);
 
@@ -63,7 +63,7 @@ final class GoogleCalendar
 
     public function updateEvent($eventId, $summary, $location, $from, $to, $description = '')
     {
-        $calendarId = config('google-api.service.calendar.owner.email');
+        $calendarId = config('google-api-service.calendar.owner.email');
 
         $event = new Event($this->service->events->get($calendarId, $eventId));
         $event->setSummary($summary);
@@ -85,7 +85,7 @@ final class GoogleCalendar
 
     public function deleteEvent($eventId)
     {
-        $calendarId = config('google-api.service.calendar.owner.email');
+        $calendarId = config('google-api-service.calendar.owner.email');
 
         $this->service->events->delete($calendarId, $eventId);
 

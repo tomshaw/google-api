@@ -33,10 +33,10 @@ final class GoogleMail
             $client->createAuthUrl();
         }
 
-        $this->service = new Gmail($client->getClient());
+        $this->service = new Gmail($client->client);
 
-        $this->setFromName(config('google-api.service.gmail.sender.name'));
-        $this->setFromEmail(config('google-api.service.gmail.sender.email'));
+        $this->setFromName(config('google-api-service.gmail.sender.name'));
+        $this->setFromEmail(config('google-api-service.gmail.sender.email'));
     }
 
     public function setToName($toName): GoogleMail

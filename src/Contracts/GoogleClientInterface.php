@@ -2,13 +2,25 @@
 
 namespace TomShaw\GoogleApi\Contracts;
 
-use Google\Client;
 use Illuminate\Support\Collection;
+use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Models\GoogleToken;
 
 interface GoogleClientInterface
 {
-    public function getClient(): Client;
+    public function setAuthConfig(string $authConfig): GoogleClient;
+
+    public function setApplicationName(string $applicationName): GoogleClient;
+
+    public function addScope(array $scopes): GoogleClient;
+
+    public function setAccessType(string $accessType = 'offline'): GoogleClient;
+
+    public function setPrompt(string $prompt = 'none'): GoogleClient;
+
+    public function setApprovalPrompt(string $approvalPrompt = 'offline'): GoogleClient;
+
+    public function setIncludeGrantedScopes(bool $includeGrantedScopes = true): GoogleClient;
 
     public function createAuthUrl(): void;
 
