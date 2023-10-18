@@ -5,6 +5,7 @@ namespace TomShaw\GoogleApi\Api;
 use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
 use Google\Service\Calendar\EventDateTime;
+use Google\Service\Calendar\Events;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Traits\WithDates;
 
@@ -14,17 +15,20 @@ final class GoogleCalendar
 
     protected Calendar $service;
 
-    public function __construct(GoogleClient $client)
-    {
+    protected string $calendarId;
+
+    public function __construct(
+        protected GoogleClient $client
+    ) {
         $client->initialize();
 
         $this->service = new Calendar($client->client);
+
+        $this->calendarId = config('google-api.service.config.calendar.id');
     }
 
-    public function listEvents(int $maxResults = 10, string $orderBy = 'startTime', bool $singleEvents = true)
+    public function listEvents(int $maxResults = 10, string $orderBy = 'startTime', bool $singleEvents = true): Events
     {
-        $calendarId = config('google-api-service.calendar.owner.email');
-
         $options = [
             'maxResults' => $maxResults,
             'orderBy' => $orderBy,
@@ -32,12 +36,10 @@ final class GoogleCalendar
             'timeMin' => date('c'),
         ];
 
-        $result = $this->service->events->listEvents($calendarId, $options);
-
-        return $result->getItems();
+        return $this->service->events->listEvents($this->calendarId, $options);
     }
 
-    public function addEvent($summary, $location, $from, $to, $description = '')
+    public function addEvent(mixed $summary, mixed $location, mixed $from, mixed $to, string $description = ''): Event
     {
         $event = new Event();
         $event->setSummary($summary);
@@ -52,18 +54,12 @@ final class GoogleCalendar
         $end->setDateTime($this->date3339($to));
         $event->setEnd($end);
 
-        $calendarId = config('google-api-service.calendar.owner.email');
-
-        $insert = $this->service->events->insert($calendarId, $event);
-
-        return $insert->id;
+        return $this->service->events->insert($this->calendarId, $event);
     }
 
-    public function updateEvent($eventId, $summary, $location, $from, $to, $description = '')
+    public function updateEvent(mixed $eventId, mixed $summary, mixed $location, mixed $from, mixed $to, string $description = ''): Event
     {
-        $calendarId = config('google-api-service.calendar.owner.email');
-
-        $event = new Event($this->service->events->get($calendarId, $eventId));
+        $event = new Event($this->service->events->get($this->calendarId, $eventId));
         $event->setSummary($summary);
         $event->setLocation($location);
         $event->setDescription($description);
@@ -76,17 +72,11 @@ final class GoogleCalendar
         $end->setDateTime($this->date3339($to));
         $event->setEnd($end);
 
-        $update = $this->service->events->update($calendarId, $eventId, $event);
-
-        return $update;
+        return $this->service->events->update($this->calendarId, $eventId, $event);
     }
 
-    public function deleteEvent($eventId)
+    public function deleteEvent($eventId): mixed
     {
-        $calendarId = config('google-api-service.calendar.owner.email');
-
-        $this->service->events->delete($calendarId, $eventId);
-
-        return $this;
+        return $this->service->events->delete($this->calendarId, $eventId);
     }
 }

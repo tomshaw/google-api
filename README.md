@@ -72,6 +72,7 @@ Using the client to fetch calendar events.
     public function mount(GoogleClient $client)
     {
         $calendar = GoogleApi::calendar($client)->listEvents();
+        $events = $calendar->getItems();
     }
 ```
 

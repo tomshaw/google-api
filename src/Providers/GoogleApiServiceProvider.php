@@ -15,16 +15,12 @@ class GoogleApiServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/../../config/config.php' => config_path('google-api.php')], 'config');
-            $this->publishes([__DIR__.'/../../config/scopes.php' => config_path('google-api-scopes.php')], 'config');
-            $this->publishes([__DIR__.'/../../config/service.php' => config_path('google-api-service.php')], 'config');
         }
     }
 
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'google-api');
-        $this->mergeConfigFrom(__DIR__.'/../../config/scopes.php', 'google-api-scopes');
-        $this->mergeConfigFrom(__DIR__.'/../../config/service.php', 'google-api-service');
 
         $this->app->bind(GoogleClientInterface::class, fn () => new GoogleClient(new Client()));
     }

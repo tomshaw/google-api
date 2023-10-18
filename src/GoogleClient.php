@@ -30,7 +30,7 @@ class GoogleClient implements GoogleClientInterface
 
         $client->setAuthConfig(config('google-api.auth_config'));
 
-        $client->addScope(config('google-api-scopes'));
+        $client->addScope(config('google-api.service_scopes'));
 
         $client->setApplicationName(config('google-api.application_name'));
 

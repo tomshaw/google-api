@@ -1,5 +1,8 @@
 <?php
 
+use Google\Service\Calendar;
+use Google\Service\Gmail;
+
 return [
     /**
      * Sets how the token is stored.
@@ -45,4 +48,33 @@ return [
      * will include any previous authorizations granted to this user/application combination for other scopes.
      */
     'include_grant_scopes' => true,
+
+    /**
+     * Scopes to be requested as part of the OAuth2.0 flow.
+     */
+    'service_scopes' => [
+        Calendar::CALENDAR,
+        Gmail::GMAIL_SEND,
+    ],
+
+    /**
+     * User defined custom API service configuration settings.
+     */
+    'service' => [
+        'config' => [
+            'gmail' => [
+                'sender' => [
+                    'name' => 'Your Name',
+                    'email' => 'name@example.com',
+                ],
+            ],
+            'calendar' => [
+                'id' => 'name@example.com',
+                'owner' => [
+                    'name' => 'Your Name',
+                    'email' => 'name@example.com',
+                ],
+            ],
+        ],
+    ],
 ];

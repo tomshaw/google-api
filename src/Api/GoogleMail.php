@@ -27,17 +27,18 @@ final class GoogleMail
 
     protected $message;
 
-    public function __construct(GoogleClient $client)
-    {
+    public function __construct(
+        protected GoogleClient $client
+    ) {
         $client->initialize();
 
         $this->service = new Gmail($client->client);
 
-        $this->setFromName(config('google-api-service.gmail.sender.name'));
-        $this->setFromEmail(config('google-api-service.gmail.sender.email'));
+        $this->setFromName(config('google-api.service.config.gmail.sender.name'));
+        $this->setFromEmail(config('google-api.service.config.gmail.sender.email'));
     }
 
-    public function setToName($toName): GoogleMail
+    public function setToName(string $toName): GoogleMail
     {
         $this->toName = $toName;
 
@@ -49,14 +50,14 @@ final class GoogleMail
         return $this->toName;
     }
 
-    public function setToEmail($toEmail): GoogleMail
+    public function setToEmail(string $toEmail): GoogleMail
     {
         $this->toEmail = $toEmail;
 
         return $this;
     }
 
-    public function setCC($ccList): mixed
+    public function setCC(array $ccList): GoogleMail
     {
         $this->ccList = $ccList;
 
@@ -82,7 +83,7 @@ final class GoogleMail
         return $this->toEmail;
     }
 
-    public function setFromName($fromName): GoogleMail
+    public function setFromName(string $fromName): GoogleMail
     {
         $this->fromName = $fromName;
 
@@ -94,7 +95,7 @@ final class GoogleMail
         return $this->fromName;
     }
 
-    public function setFromEmail($fromEmail): GoogleMail
+    public function setFromEmail(string $fromEmail): GoogleMail
     {
         $this->fromEmail = $fromEmail;
 
@@ -106,7 +107,7 @@ final class GoogleMail
         return $this->fromEmail;
     }
 
-    public function setSubject($subject): GoogleMail
+    public function setSubject(string $subject): GoogleMail
     {
         $this->subject = $subject;
 
@@ -118,7 +119,7 @@ final class GoogleMail
         return $this->subject;
     }
 
-    public function setMessage($message): GoogleMail
+    public function setMessage(string $message): GoogleMail
     {
         $this->message = $message;
 
@@ -130,7 +131,7 @@ final class GoogleMail
         return $this->message;
     }
 
-    public function to($email, $name = ''): GoogleMail
+    public function to(string $email, string $name): GoogleMail
     {
         $this->setToEmail($email);
         $this->setToName($name);
@@ -138,7 +139,7 @@ final class GoogleMail
         return $this;
     }
 
-    public function from($email, $name = ''): GoogleMail
+    public function from(string $email, string $name): GoogleMail
     {
         $this->setFromEmail($email);
         $this->setFromName($name);
