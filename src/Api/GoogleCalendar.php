@@ -16,8 +16,14 @@ final class GoogleCalendar
 {
     use WithDates;
 
+    /**
+     * The service property is an instance of the Calendar class.
+     */
     protected Calendar $service;
 
+    /**
+     * The calendarId property is a string that represents the ID of the calendar.
+     */
     protected string $calendarId;
 
     /**
