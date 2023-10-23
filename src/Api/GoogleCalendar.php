@@ -9,6 +9,9 @@ use Google\Service\Calendar\Events;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Traits\WithDates;
 
+/**
+ * Class GoogleCalendar
+ */
 final class GoogleCalendar
 {
     use WithDates;
@@ -17,6 +20,9 @@ final class GoogleCalendar
 
     protected string $calendarId;
 
+    /**
+     * GoogleCalendar constructor.
+     */
     public function __construct(
         protected GoogleClient $client
     ) {
@@ -27,6 +33,9 @@ final class GoogleCalendar
         $this->calendarId = config('google-api.service.config.calendar.id');
     }
 
+    /**
+     * Lists events.
+     */
     public function listEvents(int $maxResults = 10, string $orderBy = 'startTime', bool $singleEvents = true): Events
     {
         $options = [
@@ -39,7 +48,17 @@ final class GoogleCalendar
         return $this->service->events->listEvents($this->calendarId, $options);
     }
 
-    public function addEvent(mixed $summary, mixed $location, mixed $from, mixed $to, string $description = ''): Event
+    /**
+     * Adds an event.
+     *
+     * @param  string  $summary The summary of the event.
+     * @param  string  $location The location of the event.
+     * @param  string  $from The start time of the event.
+     * @param  string  $to The end time of the event.
+     * @param  string  $description The description of the event (optional).
+     * @return Event The added event.
+     */
+    public function addEvent(string $summary, string $location, string $from, string $to, string $description = ''): Event
     {
         $event = new Event();
         $event->setSummary($summary);
@@ -57,7 +76,18 @@ final class GoogleCalendar
         return $this->service->events->insert($this->calendarId, $event);
     }
 
-    public function updateEvent(mixed $eventId, mixed $summary, mixed $location, mixed $from, mixed $to, string $description = ''): Event
+    /**
+     * Updates an event.
+     *
+     * @param  string  $eventId The ID of the event to update.
+     * @param  string  $summary The summary of the event.
+     * @param  string  $location The location of the event.
+     * @param  string  $from The start time of the event.
+     * @param  string  $to The end time of the event.
+     * @param  string  $description The description of the event (optional).
+     * @return Event The updated event.
+     */
+    public function updateEvent(string $eventId, string $summary, string $location, string $from, string $to, string $description = ''): Event
     {
         $event = new Event($this->service->events->get($this->calendarId, $eventId));
         $event->setSummary($summary);
@@ -75,8 +105,15 @@ final class GoogleCalendar
         return $this->service->events->update($this->calendarId, $eventId, $event);
     }
 
-    public function deleteEvent($eventId): mixed
+    /**
+     * Deletes an event.
+     *
+     * @param  string  $eventId The ID of the event to delete.
+     * @param  array  $optParams Optional parameters.
+     * @return mixed The response from the Calendar API.
+     */
+    public function deleteEvent(string $eventId, array $optParams = []): mixed
     {
-        return $this->service->events->delete($this->calendarId, $eventId);
+        return $this->service->events->delete($this->calendarId, $eventId, $optParams);
     }
 }

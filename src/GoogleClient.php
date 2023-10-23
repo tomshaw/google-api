@@ -10,8 +10,14 @@ use TomShaw\GoogleApi\Exceptions\GoogleClientException;
 use TomShaw\GoogleApi\Models\GoogleToken;
 use TomShaw\GoogleApi\Resources\AccessTokenResource;
 
+/**
+ * Class GoogleClient
+ */
 class GoogleClient implements GoogleClientInterface
 {
+    /**
+     * @var array
+     */
     public static $rules = [
         'access_token' => 'required|string',
         'refresh_token' => 'required|string',
@@ -21,6 +27,11 @@ class GoogleClient implements GoogleClientInterface
         'created' => 'required|numeric',
     ];
 
+    /**
+     * GoogleClient constructor.
+     *
+     * @throws GoogleClientException
+     */
     public function __construct(
         public Client $client
     ) {
@@ -43,6 +54,13 @@ class GoogleClient implements GoogleClientInterface
         $client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
     }
 
+    /**
+     * Initializes the client.
+     *
+     * @return GoogleClient The current instance.
+     *
+     * @throws GoogleClientException If the access token is invalid or missing.
+     */
     public function initialize(): GoogleClient
     {
         $accessToken = $this->getAccessToken();
@@ -69,6 +87,9 @@ class GoogleClient implements GoogleClientInterface
         return $this;
     }
 
+    /**
+     * Creates an authentication URL and redirects to it.
+     */
     public function createAuthUrl(): void
     {
         $authUrl = $this->client->createAuthUrl();
@@ -76,6 +97,11 @@ class GoogleClient implements GoogleClientInterface
         exit;
     }
 
+    /**
+     * Gets the access token.
+     *
+     * @return GoogleToken|Collection|null The access token.
+     */
     public function getAccessToken(): GoogleToken|Collection|null
     {
         if (config('google-api.token_storage') === 'session') {
@@ -89,6 +115,12 @@ class GoogleClient implements GoogleClientInterface
         }
     }
 
+    /**
+     * Sets the access token.
+     *
+     * @param  mixed  $accessToken The access token to set.
+     * @return GoogleToken|bool The new access token, or true if the token was stored in the session.
+     */
     public function setAccessToken($accessToken): GoogleToken|bool
     {
         if (config('google-api.token_storage') === 'session') {
@@ -100,6 +132,14 @@ class GoogleClient implements GoogleClientInterface
         }
     }
 
+    /**
+     * Fetches an access token with a refresh token.
+     *
+     * @param  mixed  $refreshToken The refresh token to use.
+     * @return array|bool The new access token, or false on failure.
+     *
+     * @throws GoogleClientException If there is an error in the response from the API.
+     */
     public function fetchAccessTokenWithRefreshToken($refreshToken): array|bool
     {
         $response = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
@@ -113,6 +153,12 @@ class GoogleClient implements GoogleClientInterface
         return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
     }
 
+    /**
+     * Fetches an access token with an authorization code.
+     *
+     * @param  mixed  $authCode The authorization code to use.
+     * @return array|bool The new access token, or false on failure.
+     */
     public function fetchAccessTokenWithAuthCode($authCode): array|bool
     {
         $response = $this->client->fetchAccessTokenWithAuthCode($authCode);
@@ -126,6 +172,19 @@ class GoogleClient implements GoogleClientInterface
         return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
     }
 
+    /**
+     * Validates the provided access token data.
+     *
+     * @param  string  $accessToken The access token.
+     * @param  string  $refreshToken The refresh token.
+     * @param  int  $expiresIn The expiration time of the access token, in seconds.
+     * @param  string  $scope The scope of the access token.
+     * @param  string  $tokenType The type of the token.
+     * @param  int  $created The time the token was created, as a Unix timestamp.
+     * @return array The validated data.
+     *
+     * @throws GoogleClientException If validation fails.
+     */
     public function validate(string $accessToken, string $refreshToken, int $expiresIn, string $scope, string $tokenType, int $created): array
     {
         $validator = Validator::make(['access_token' => $accessToken, 'refresh_token' => $refreshToken, 'expires_in' => $expiresIn, 'scope' => $scope, 'token_type' => $tokenType, 'created' => $created], self::$rules);
