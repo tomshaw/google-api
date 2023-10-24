@@ -17,12 +17,12 @@ final class GoogleCalendar
     use WithDates;
 
     /**
-     * The service property is an instance of the Calendar class.
+     * @var Calendar The service property is an instance of the Calendar class.
      */
     protected Calendar $service;
 
     /**
-     * The calendarId property is a string that represents the ID of the calendar.
+     * @var string The calendarId property is a string that represents the ID of the calendar.
      */
     protected string $calendarId;
 
@@ -40,7 +40,14 @@ final class GoogleCalendar
     }
 
     /**
-     * Lists events.
+     * Lists events from a calendar.
+     *
+     * @param  int  $maxResults The maximum number of events to return. Default is 10.
+     * @param  string  $orderBy The order of the events returned in the result. Default is 'startTime'.
+     * @param  bool  $singleEvents Whether to expand recurring events into instances and only return single one-off events and instances of recurring events. Default is true.
+     * @return Events Returns an Events object containing the list of events.
+     *
+     * @throws \Google\Exception Throws a Google Exception if the API request fails.
      */
     public function listEvents(int $maxResults = 10, string $orderBy = 'startTime', bool $singleEvents = true): Events
     {

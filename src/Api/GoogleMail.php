@@ -14,20 +14,44 @@ use TomShaw\GoogleApi\GoogleClient;
  */
 final class GoogleMail
 {
+    /**
+     * @var Gmail The Gmail service object.
+     */
     protected Gmail $service;
 
+    /**
+     * @var string|null The name of the recipient.
+     */
     protected ?string $toName;
 
+    /**
+     * @var string|null The email address of the recipient.
+     */
     protected ?string $toEmail;
 
+    /**
+     * @var array The list of CC recipients.
+     */
     protected array $ccList = [];
 
+    /**
+     * @var string|null The name of the sender.
+     */
     protected ?string $fromName;
 
+    /**
+     * @var string|null The email address of the sender.
+     */
     protected ?string $fromEmail;
 
+    /**
+     * @var string|null The subject of the email.
+     */
     protected ?string $subject;
 
+    /**
+     * @var string|null The message body of the email.
+     */
     protected ?string $message;
 
     /**
