@@ -71,7 +71,7 @@ final class GoogleMail
     /**
      * Sets the 'to' name.
      *
-     * @param  string  $toName The name to set.
+     * @param  string  $toName  The name to set.
      * @return GoogleMail The current instance.
      */
     public function setToName(string $toName): GoogleMail
@@ -94,7 +94,7 @@ final class GoogleMail
     /**
      * Sets the 'to' email.
      *
-     * @param  string  $toEmail The email to set.
+     * @param  string  $toEmail  The email to set.
      * @return GoogleMail The current instance.
      */
     public function setToEmail(string $toEmail): GoogleMail
@@ -117,7 +117,7 @@ final class GoogleMail
     /**
      * Sets the CC list.
      *
-     * @param  array  $ccList The CC list to set.
+     * @param  array  $ccList  The CC list to set.
      * @return GoogleMail The current instance.
      */
     public function setCC(array $ccList = []): GoogleMail
@@ -156,7 +156,7 @@ final class GoogleMail
     /**
      * Sets the 'from' name.
      *
-     * @param  string  $fromName The name to set.
+     * @param  string  $fromName  The name to set.
      * @return GoogleMail The current instance.
      */
     public function setFromName(string $fromName): GoogleMail
@@ -179,7 +179,7 @@ final class GoogleMail
     /**
      * Sets the 'from' email.
      *
-     * @param  string  $fromEmail The email to set.
+     * @param  string  $fromEmail  The email to set.
      * @return GoogleMail The current instance.
      */
     public function setFromEmail(string $fromEmail): GoogleMail
@@ -202,7 +202,7 @@ final class GoogleMail
     /**
      * Sets the subject of the email.
      *
-     * @param  string  $subject The subject to set.
+     * @param  string  $subject  The subject to set.
      * @return GoogleMail The current instance.
      */
     public function setSubject(string $subject): GoogleMail
@@ -225,7 +225,7 @@ final class GoogleMail
     /**
      * Sets the message of the email.
      *
-     * @param  string  $message The message to set.
+     * @param  string  $message  The message to set.
      * @return GoogleMail The current instance.
      */
     public function setMessage(string $message): GoogleMail
@@ -248,7 +248,7 @@ final class GoogleMail
     /**
      * Sets both 'to' name and email in one method call.
      *
-     * @param  string  $email The 'to' email to set.
+     * @param  string  $email  The 'to' email to set.
      * @param  string  $name  The 'to' name to set.
      * @return GoogleMail The current instance.
      */
@@ -263,7 +263,7 @@ final class GoogleMail
     /**
      * Sets both 'from' name and email in one method call.
      *
-     * @param  string  $email The 'from' email to set.
+     * @param  string  $email  The 'from' email to set.
      * @param  string  $name  The 'from' name to set.
      * @return GoogleMail The current instance.
      */
@@ -278,7 +278,7 @@ final class GoogleMail
     /**
      * Sets the subject of the email.
      *
-     * @param  mixed  $subject The subject to set.
+     * @param  mixed  $subject  The subject to set.
      * @return GoogleMail The current instance.
      */
     public function subject($subject): GoogleMail
@@ -291,7 +291,7 @@ final class GoogleMail
     /**
      * Sets the message of the email.
      *
-     * @param  mixed  $message The message to set.
+     * @param  mixed  $message  The message to set.
      * @return GoogleMail The current instance.
      */
     public function message($message): GoogleMail
@@ -304,7 +304,7 @@ final class GoogleMail
     /**
      * Sets the message of the email using a Mailable instance.
      *
-     * @param  Mailable  $mailable The Mailable instance.
+     * @param  Mailable  $mailable  The Mailable instance.
      * @return GoogleMail The current instance.
      */
     public function mailable(Mailable $mailable): GoogleMail
@@ -368,13 +368,13 @@ final class GoogleMail
     /**
      * Builds an email message string.
      *
-     * @param  string  $fromEmail The sender's email address.
-     * @param  string  $fromName The sender's name.
-     * @param  string  $toEmail The recipient's email address.
-     * @param  string  $toName The recipient's name.
-     * @param  string  $ccListString The list of CC recipients as a string.
-     * @param  string  $subject The subject of the email.
-     * @param  string  $message The body of the email.
+     * @param  string  $fromEmail  The sender's email address.
+     * @param  string  $fromName  The sender's name.
+     * @param  string  $toEmail  The recipient's email address.
+     * @param  string  $toName  The recipient's name.
+     * @param  string  $ccListString  The list of CC recipients as a string.
+     * @param  string  $subject  The subject of the email.
+     * @param  string  $message  The body of the email.
      * @return string Returns the built message as a string.
      */
     protected function buildMessage(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccListString, string $subject, string $message): string

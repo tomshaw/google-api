@@ -42,9 +42,9 @@ final class GoogleCalendar
     /**
      * Lists events from a calendar.
      *
-     * @param  int  $maxResults The maximum number of events to return. Default is 10.
-     * @param  string  $orderBy The order of the events returned in the result. Default is 'startTime'.
-     * @param  bool  $singleEvents Whether to expand recurring events into instances and only return single one-off events and instances of recurring events. Default is true.
+     * @param  int  $maxResults  The maximum number of events to return. Default is 10.
+     * @param  string  $orderBy  The order of the events returned in the result. Default is 'startTime'.
+     * @param  bool  $singleEvents  Whether to expand recurring events into instances and only return single one-off events and instances of recurring events. Default is true.
      * @return Events Returns an Events object containing the list of events.
      *
      * @throws \Google\Exception Throws a Google Exception if the API request fails.
@@ -64,11 +64,11 @@ final class GoogleCalendar
     /**
      * Adds an event.
      *
-     * @param  string  $summary The summary of the event.
-     * @param  string  $location The location of the event.
-     * @param  string  $from The start time of the event.
-     * @param  string  $to The end time of the event.
-     * @param  string  $description The description of the event (optional).
+     * @param  string  $summary  The summary of the event.
+     * @param  string  $location  The location of the event.
+     * @param  string  $from  The start time of the event.
+     * @param  string  $to  The end time of the event.
+     * @param  string  $description  The description of the event (optional).
      * @return Event The added event.
      */
     public function addEvent(string $summary, string $location, string $from, string $to, string $description = ''): Event
@@ -92,12 +92,12 @@ final class GoogleCalendar
     /**
      * Updates an event.
      *
-     * @param  string  $eventId The ID of the event to update.
-     * @param  string  $summary The summary of the event.
-     * @param  string  $location The location of the event.
-     * @param  string  $from The start time of the event.
-     * @param  string  $to The end time of the event.
-     * @param  string  $description The description of the event (optional).
+     * @param  string  $eventId  The ID of the event to update.
+     * @param  string  $summary  The summary of the event.
+     * @param  string  $location  The location of the event.
+     * @param  string  $from  The start time of the event.
+     * @param  string  $to  The end time of the event.
+     * @param  string  $description  The description of the event (optional).
      * @return Event The updated event.
      */
     public function updateEvent(string $eventId, string $summary, string $location, string $from, string $to, string $description = ''): Event
@@ -121,8 +121,8 @@ final class GoogleCalendar
     /**
      * Deletes an event.
      *
-     * @param  string  $eventId The ID of the event to delete.
-     * @param  array  $optParams Optional parameters.
+     * @param  string  $eventId  The ID of the event to delete.
+     * @param  array  $optParams  Optional parameters.
      * @return mixed The response from the Calendar API.
      */
     public function deleteEvent(string $eventId, array $optParams = []): mixed

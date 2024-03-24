@@ -118,7 +118,7 @@ class GoogleClient implements GoogleClientInterface
     /**
      * Sets the access token.
      *
-     * @param  mixed  $accessToken The access token to set.
+     * @param  mixed  $accessToken  The access token to set.
      * @return GoogleToken|bool The new access token, or true if the token was stored in the session.
      */
     public function setAccessToken($accessToken): GoogleToken|bool
@@ -135,7 +135,7 @@ class GoogleClient implements GoogleClientInterface
     /**
      * Fetches an access token with a refresh token.
      *
-     * @param  mixed  $refreshToken The refresh token to use.
+     * @param  mixed  $refreshToken  The refresh token to use.
      * @return array|bool The new access token, or false on failure.
      *
      * @throws GoogleClientException If there is an error in the response from the API.
@@ -156,7 +156,7 @@ class GoogleClient implements GoogleClientInterface
     /**
      * Fetches an access token with an authorization code.
      *
-     * @param  mixed  $authCode The authorization code to use.
+     * @param  mixed  $authCode  The authorization code to use.
      * @return array|bool The new access token, or false on failure.
      */
     public function fetchAccessTokenWithAuthCode($authCode): array|bool
@@ -175,12 +175,12 @@ class GoogleClient implements GoogleClientInterface
     /**
      * Validates the provided access token data.
      *
-     * @param  string  $accessToken The access token.
-     * @param  string  $refreshToken The refresh token.
-     * @param  int  $expiresIn The expiration time of the access token, in seconds.
-     * @param  string  $scope The scope of the access token.
-     * @param  string  $tokenType The type of the token.
-     * @param  int  $created The time the token was created, as a Unix timestamp.
+     * @param  string  $accessToken  The access token.
+     * @param  string  $refreshToken  The refresh token.
+     * @param  int  $expiresIn  The expiration time of the access token, in seconds.
+     * @param  string  $scope  The scope of the access token.
+     * @param  string  $tokenType  The type of the token.
+     * @param  int  $created  The time the token was created, as a Unix timestamp.
      * @return array The validated data.
      *
      * @throws GoogleClientException If validation fails.
