@@ -95,6 +95,24 @@ Using the client to send emails.
     }
 ```
 
+## Unused services
+
+There are over 200 Google API's. To avoid shipping these dependencies you should specify the services you want to use in your `composer.json`:
+
+```json
+{
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Drive",
+            "YouTube"
+        ]
+    }
+}
+```
+
 ## Testing
 
 ``` bash
