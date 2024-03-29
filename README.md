@@ -28,11 +28,6 @@ Run the migration if you wish to use database token storage
 php artisan migrate
 ```
 
-## Requirements
-
-- `Laravel 10` (https://laravel.com/) 
-- `PHP 8.1` (https://php.net)
-
 ## Basic Usage
 
 Authorizing the application and persisting the token.
@@ -112,16 +107,6 @@ There are over 200 Google API's. To avoid shipping these dependencies you should
     }
 }
 ```
-
-## Testing
-
-``` bash
-composer test
-```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
 ## Contributing
 
