@@ -1,8 +1,10 @@
 # GoogleApi ☁️
 
-[![Latest Version](https://img.shields.io/github/release/tomshaw/google-api.svg?style=flat-square)](https://github.com/tomshaw/google-api/releases)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tomshaw/google-api/run-tests.yml?branch=master&style=flat-square&label=tests)
-[![Total Downloads](https://img.shields.io/packagist/dt/tomshaw/google-api.svg?style=flat-square)](https://packagist.org/packages/tomshaw/google-api)
+![issues](https://img.shields.io/github/issues/tomshaw/google-api?style=flat&logo=appveyor)
+![forks](https://img.shields.io/github/forks/tomshaw/google-api?style=flat&logo=appveyor)
+![stars](https://img.shields.io/github/stars/tomshaw/google-api?style=flat&logo=appveyor)
+[![GitHub license](https://img.shields.io/github/license/tomshaw/google-api)](https://github.com/tomshaw/google-api/blob/master/LICENSE)
 
 A simple to use Laravel Google API Client.
 
