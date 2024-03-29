@@ -28,6 +28,22 @@ Run the migration if you wish to use database token storage
 php artisan migrate
 ```
 
+To avoid shipping all 200 Google API's you should specify the services you wish to use in your `composer.json`:
+
+```json
+{
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Gmail",
+            "Calendar"
+        ]
+    }
+}
+```
+
 ## Basic Usage
 
 Authorizing the application and persisting the token.
@@ -88,24 +104,6 @@ Using the client to send emails.
         $mailer->mailable(new OrderMailable($model, 'template-name'));
         $mailer->send();
     }
-```
-
-## Unused services
-
-There are over 200 Google API's. To avoid shipping these dependencies you should specify the services you want to use in your `composer.json`:
-
-```json
-{
-    "scripts": {
-        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
-    },
-    "extra": {
-        "google/apiclient-services": [
-            "Drive",
-            "YouTube"
-        ]
-    }
-}
 ```
 
 ## Contributing
