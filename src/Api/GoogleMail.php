@@ -328,10 +328,8 @@ final class GoogleMail
 
         $message = $this->buildMessage($fromEmail, $fromName, $toEmail, $toName, $ccListString, $subject, $message);
 
-        $raw = rtrim(strtr(base64_encode($message), '+/', '-_'), '=');
-
         $msg = new Message();
-        $msg->setRaw($raw);
+        $msg->setRaw($message);
 
         return $this->service->users_messages->send('me', $msg);
     }
@@ -350,18 +348,18 @@ final class GoogleMail
      */
     protected function buildMessage(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccListString, string $subject, string $message): string
     {
-        $str = "From: $fromName <$fromEmail>\r\n";
-        $str .= "To: $toName <$toEmail>\r\n";
+        $headers = "From: $fromName <$fromEmail>\r\n";
+        $headers .= "To: $toName <$toEmail>\r\n";
         if (count($this->getCC())) {
-            $str .= "CC: {$ccListString}\r\n";
+            $headers .= "CC: {$ccListString}\r\n";
         }
-        $str .= 'Subject: =?utf-8?B?'.base64_encode($subject)."?=\r\n";
-        $str .= "MIME-Version: 1.0\r\n";
-        $str .= "Content-Type: text/html; charset=utf-8\r\n";
-        // $str .= "Content-Transfer-Encoding: base64" . "\r\n\r\n";
-        $str .= 'Content-Transfer-Encoding: 8bit'."\r\n\r\n";
-        $str .= $message;
+        $headers .= 'Subject: =?utf-8?B?'.base64_encode($subject)."?=\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+        $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
 
-        return $str;
+        $encodedMessage = rtrim(strtr(base64_encode($message), '+/', '-_'), '=');
+
+        return $headers.$encodedMessage;
     }
 }

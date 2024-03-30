@@ -6,7 +6,7 @@
 ![stars](https://img.shields.io/github/stars/tomshaw/google-api?style=flat&logo=appveyor)
 [![GitHub license](https://img.shields.io/github/license/tomshaw/google-api)](https://github.com/tomshaw/google-api/blob/master/LICENSE)
 
-A simple to use Laravel Google API Client.
+A Laravel Service Google API Client.
 
 ## Installation
 
@@ -53,6 +53,26 @@ To avoid shipping all 200 Google API's you should specify the services you wish 
     }
 }
 ```
+
+Here's a brief explanation of the configuration file is used to set up a Google API client:
+
+- `token_storage`: This is where the OAuth2.0 tokens will be stored. In this case, they are stored in the session.
+
+- `auth_config`: This is the path to the JSON file that contains your Google API client credentials. 
+
+- `application_name`: This is the name of your application.
+
+- `prompt`: This is the type of prompt that will be presented to the user during the OAuth2.0 flow. The 'consent' prompt asks the user to grant your application access to the scopes you're requesting.
+
+- `approval_prompt`: This is another setting for the OAuth2.0 flow. The 'auto' setting means that the user will only be prompted for approval the first time they authenticate your application.
+
+- `access_type`: This is set to 'offline' to allow your application to access the user's data when the user is not present.
+
+- `include_grant_scopes`: This is set to true to include the scopes from the initial authorization in the refresh token request.
+
+- `service_scopes`: These are the scopes your application is requesting access to. In this case, your application is requesting access to the user's Google Calendar and the ability to send emails on behalf of the user.
+
+The Google API client uses these settings to handle the OAuth2.0 flow and interact with the Google APIs.
 
 ## Basic Usage
 
@@ -106,7 +126,6 @@ This packages includes demonstration Google `Calendar` and `Gmail` adapter class
 
 > Using the client to send emails.
 
-> Note: The following example uses a Mailable class that renders a blade template. 
 
 ```php
     public function mount(GoogleClient $client)
