@@ -334,19 +334,23 @@ final class GoogleMail
         return $this->service->users_messages->send('me', $msg);
     }
 
-    /**
-     * Builds an email message string.
-     *
-     * @param  string  $fromEmail  The sender's email address.
-     * @param  string  $fromName  The sender's name.
-     * @param  string  $toEmail  The recipient's email address.
-     * @param  string  $toName  The recipient's name.
-     * @param  string  $ccListString  The list of CC recipients as a string.
-     * @param  string  $subject  The subject of the email.
-     * @param  string  $message  The body of the email.
-     * @return string Returns the built message as a string.
-     */
     protected function buildMessage(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccListString, string $subject, string $message): string
+    {
+        $headers = "From: $fromName <$fromEmail>\r\n";
+        $headers .= "To: $toName <$toEmail>\r\n";
+        if (count($this->getCC())) {
+            $headers .= "CC: {$ccListString}\r\n";
+        }
+        $headers .= "Subject: $subject\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+        $headers .= 'Content-Transfer-Encoding: 8bit'."\r\n\r\n";
+        $headers .= $message;
+
+        return base64_encode($headers);
+    }
+
+    protected function buildMessageBinary(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccListString, string $subject, string $message, string $contentType): string
     {
         $headers = "From: $fromName <$fromEmail>\r\n";
         $headers .= "To: $toName <$toEmail>\r\n";
@@ -355,11 +359,16 @@ final class GoogleMail
         }
         $headers .= 'Subject: =?utf-8?B?'.base64_encode($subject)."?=\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+        $headers .= "Content-Type: $contentType\r\n";
         $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
 
-        $encodedMessage = rtrim(strtr(base64_encode($message), '+/', '-_'), '=');
+        $encodedMessage = base64_encode($message);
 
         return $headers.$encodedMessage;
+    }
+
+    protected function encodeUrlSafeMessage(string $message): string
+    {
+        return rtrim(strtr(base64_encode($message), '+/', '-_'), '=');
     }
 }
