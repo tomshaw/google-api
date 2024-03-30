@@ -9,34 +9,40 @@ use Google\Service\Calendar\Events;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Traits\WithDates;
 
-/**
- * Class GoogleCalendar
- */
 final class GoogleCalendar
 {
     use WithDates;
 
-    /**
-     * @var Calendar The service property is an instance of the Calendar class.
-     */
     protected Calendar $service;
 
-    /**
-     * @var string The calendarId property is a string that represents the ID of the calendar.
-     */
     protected string $calendarId;
 
+    public function __construct(protected GoogleClient $client)
+    {
+        $this->service = new Calendar($client());
+    }
+
     /**
-     * GoogleCalendar constructor.
+     * Sets the calendar ID.
+     *
+     * @param  string  $calendarId  The calendar ID to set.
+     * @return GoogleCalendar The current instance.
      */
-    public function __construct(
-        protected GoogleClient $client
-    ) {
-        $client->initialize();
+    public function setCalendarId(string $calendarId): GoogleCalendar
+    {
+        $this->calendarId = $calendarId;
 
-        $this->service = new Calendar($client->client);
+        return $this;
+    }
 
-        $this->calendarId = config('google-api.service.config.calendar.id');
+    /**
+     * Gets the calendar ID.
+     *
+     * @return string The calendar ID.
+     */
+    public function getCalendarId(): string
+    {
+        return $this->calendarId;
     }
 
     /**

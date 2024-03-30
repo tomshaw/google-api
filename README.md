@@ -16,6 +16,16 @@ You can install the package via composer:
 composer require tomshaw/google-api
 ```
 
+If you're facing a timeout error then increase the timeout for composer:
+
+```json
+{
+    "config": {
+        "process-timeout": 600
+    }
+}
+```
+
 Publish configuration files
 
 ```
@@ -79,17 +89,22 @@ class GoogleAuthController extends Controller
 }
 ```
 
-Using the client to fetch calendar events.
+## Included Adapters
+
+This packages includes demonstration Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
+
+> Using the client to fetch calendar events.
 
 ```php
     public function mount(GoogleClient $client)
     {
-        $calendar = GoogleApi::calendar($client)->listEvents();
-        $events = $calendar->getItems();
+        $calendar = GoogleApi::calendar($client);
+        $calendar->setCalendarId('email@example.com');
+        $events = $calendar->listEvents()->getItems();
     }
 ```
 
-Using the client to send emails.
+> Using the client to send emails.
 
 > Note: The following example uses a Mailable class that renders a blade template. 
 
@@ -99,6 +114,7 @@ Using the client to send emails.
         $model = Order::with(['user'])->where('id', $orderId)->first();
 
         $mailer = GoogleApi::gmail($client);
+        $mailer->from('email@example.com', 'Company Name');
         $mailer->to($model->user->email, $model->user->name);
         $mailer->subject('Thank you for your order.');
         $mailer->mailable(new OrderMailable($model, 'template-name'));

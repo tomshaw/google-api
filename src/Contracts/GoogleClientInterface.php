@@ -3,13 +3,10 @@
 namespace TomShaw\GoogleApi\Contracts;
 
 use Illuminate\Support\Collection;
-use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Models\GoogleToken;
 
 interface GoogleClientInterface
 {
-    public function initialize(): GoogleClient;
-
     public function createAuthUrl(): void;
 
     public function getAccessToken(): GoogleToken|Collection|null;

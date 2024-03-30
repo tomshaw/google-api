@@ -4,7 +4,6 @@ namespace TomShaw\GoogleApi\Api;
 
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
-use Illuminate\Container\Container;
 use Illuminate\Mail\Mailable;
 use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
@@ -14,58 +13,25 @@ use TomShaw\GoogleApi\GoogleClient;
  */
 final class GoogleMail
 {
-    /**
-     * @var Gmail The Gmail service object.
-     */
     protected Gmail $service;
 
-    /**
-     * @var string|null The name of the recipient.
-     */
     protected ?string $toName;
 
-    /**
-     * @var string|null The email address of the recipient.
-     */
     protected ?string $toEmail;
 
-    /**
-     * @var array The list of CC recipients.
-     */
     protected array $ccList = [];
 
-    /**
-     * @var string|null The name of the sender.
-     */
     protected ?string $fromName;
 
-    /**
-     * @var string|null The email address of the sender.
-     */
     protected ?string $fromEmail;
 
-    /**
-     * @var string|null The subject of the email.
-     */
     protected ?string $subject;
 
-    /**
-     * @var string|null The message body of the email.
-     */
     protected ?string $message;
 
-    /**
-     * GoogleMail constructor.
-     */
-    public function __construct(
-        protected GoogleClient $client
-    ) {
-        $client->initialize();
-
-        $this->service = new Gmail($client->client);
-
-        $this->setFromName(config('google-api.service.config.gmail.sender.name'));
-        $this->setFromEmail(config('google-api.service.config.gmail.sender.email'));
+    public function __construct(protected GoogleClient $client)
+    {
+        $this->service = new Gmail($client());
     }
 
     /**
@@ -151,6 +117,14 @@ final class GoogleMail
         }
 
         return implode(', ', $emails);
+    }
+
+    public function setFrom(string $email, string $name): GoogleMail
+    {
+        $this->setFromEmail($email);
+        $this->setFromName($name);
+
+        return $this;
     }
 
     /**
@@ -309,10 +283,7 @@ final class GoogleMail
      */
     public function mailable(Mailable $mailable): GoogleMail
     {
-        /** @phpstan-ignore-next-line */
-        $content = $mailable->content();
-
-        $message = Container::getInstance()->make('mailer')->render($content->view, $content->with);
+        $message = $mailable->render();
 
         $this->setMessage($message);
 

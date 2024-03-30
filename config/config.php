@@ -56,25 +56,4 @@ return [
         Calendar::CALENDAR,
         Gmail::GMAIL_SEND,
     ],
-
-    /**
-     * User defined custom API service configuration settings.
-     */
-    'service' => [
-        'config' => [
-            'gmail' => [
-                'sender' => [
-                    'name' => 'Your Name',
-                    'email' => 'name@example.com',
-                ],
-            ],
-            'calendar' => [
-                'id' => 'name@example.com',
-                'owner' => [
-                    'name' => 'Your Name',
-                    'email' => 'name@example.com',
-                ],
-            ],
-        ],
-    ],
 ];
