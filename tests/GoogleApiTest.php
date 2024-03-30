@@ -49,6 +49,15 @@ it('returns session token when token is set in session', function () {
     expect($result->toArray())->toBeArray()->and($result['access_token'])->toBe('test_token');
 });
 
+it('sets access token in session', function () {
+    Config::set('google-api.token_storage', 'session');
+    $this->googleClient->setAccessToken(['access_token' => 'test_token']);
+
+    $token = Session::get('token');
+
+    expect($token)->toBeArray()->and($token['access_token'])->toBe('test_token');
+});
+
 it('returns GoogleMail instance', function () {
     Session::put('token', [
         'access_token' => 'test_token',
