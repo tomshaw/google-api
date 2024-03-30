@@ -12,6 +12,8 @@ use TomShaw\GoogleApi\Resources\AccessTokenResource;
 
 class GoogleClient implements GoogleClientInterface
 {
+    public const SESSION_KEY = 'google_api_token';
+
     public static $rules = [
         'access_token' => 'required|string',
         'refresh_token' => 'required|string',
@@ -78,8 +80,8 @@ class GoogleClient implements GoogleClientInterface
     public function getAccessToken(): GoogleToken|Collection|null
     {
         if (config('google-api.token_storage') === 'session') {
-            if (session()->has('token')) {
-                return collect(session('token'));
+            if (session()->has(self::SESSION_KEY)) {
+                return collect(session(self::SESSION_KEY));
             } else {
                 return null;
             }
@@ -91,7 +93,7 @@ class GoogleClient implements GoogleClientInterface
     public function setAccessToken($accessToken): GoogleToken|bool
     {
         if (config('google-api.token_storage') === 'session') {
-            session(['token' => $accessToken]);
+            session([self::SESSION_KEY => $accessToken]);
 
             return true;
         } else {

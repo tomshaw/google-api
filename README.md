@@ -26,13 +26,13 @@ If you're facing a timeout error then increase the timeout for composer:
 }
 ```
 
-Publish configuration files
+You should publish the configuration file:
 
 ```
 php artisan vendor:publish --provider="TomShaw\GoogleApi\Providers\GoogleApiServiceProvider" --tag=config
 ```
 
-Run the migration if you wish to use database token storage
+Run the migration if you wish to use database token storage:
 
 ```
 php artisan migrate
@@ -54,7 +54,9 @@ To avoid shipping all 200 Google API's you should specify the services you wish 
 }
 ```
 
-Here's a brief explanation of the configuration file is used to set up a Google API client:
+## Configuration
+
+Here's a brief explanation of the application configuration file used to set up a Google API client:
 
 - `token_storage`: This is where the OAuth2.0 tokens will be stored. In this case, they are stored in the session.
 
@@ -70,7 +72,7 @@ Here's a brief explanation of the configuration file is used to set up a Google 
 
 - `include_grant_scopes`: This is set to true to include the scopes from the initial authorization in the refresh token request.
 
-- `service_scopes`: These are the scopes your application is requesting access to. In this case, your application is requesting access to the user's Google Calendar and the ability to send emails on behalf of the user.
+- `service_scopes`: These are the scopes your application is requesting access to.
 
 The Google API client uses these settings to handle the OAuth2.0 flow and interact with the Google APIs.
 

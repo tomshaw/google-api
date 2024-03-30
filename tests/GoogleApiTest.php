@@ -33,7 +33,7 @@ afterEach(function () {
 
 it('returns null when no access token is set', function () {
     Config::set('google-api.token_storage', 'session');
-    Session::forget('token');
+    Session::forget(GoogleClient::SESSION_KEY);
 
     $result = $this->googleClient->getAccessToken();
 
@@ -42,7 +42,7 @@ it('returns null when no access token is set', function () {
 
 it('returns session token when token is set in session', function () {
     Config::set('google-api.token_storage', 'session');
-    Session::put('token', ['access_token' => 'test_token']);
+    Session::put(GoogleClient::SESSION_KEY, ['access_token' => 'test_token']);
 
     $result = $this->googleClient->getAccessToken();
 
@@ -53,13 +53,13 @@ it('sets access token in session', function () {
     Config::set('google-api.token_storage', 'session');
     $this->googleClient->setAccessToken(['access_token' => 'test_token']);
 
-    $token = Session::get('token');
+    $token = Session::get(GoogleClient::SESSION_KEY);
 
     expect($token)->toBeArray()->and($token['access_token'])->toBe('test_token');
 });
 
 it('returns GoogleMail instance', function () {
-    Session::put('token', [
+    Session::put(GoogleClient::SESSION_KEY, [
         'access_token' => 'test_token',
         'refresh_token' => 'dummy_refresh_token',
         'expires_in' => 3600,
@@ -74,7 +74,7 @@ it('returns GoogleMail instance', function () {
 });
 
 it('returns GoogleCalendar instance', function () {
-    Session::put('token', [
+    Session::put(GoogleClient::SESSION_KEY, [
         'access_token' => 'test_token',
         'refresh_token' => 'dummy_refresh_token',
         'expires_in' => 3600,
