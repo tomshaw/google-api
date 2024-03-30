@@ -1,6 +1,6 @@
 {
     "name": "tomshaw/google-api",
-    "description": "A simple to use Laravel Google API Client.",
+    "description": "A Laravel Google API Client.",
     "keywords": [
         "google",
         "laravel",

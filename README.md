@@ -126,18 +126,17 @@ This packages includes demonstration Google `Calendar` and `Gmail` adapter class
 
 > Using the client to send emails.
 
-
 ```php
     public function mount(GoogleClient $client)
     {
         $model = Order::with(['user'])->where('id', $orderId)->first();
 
-        $mailer = GoogleApi::gmail($client);
-        $mailer->from('email@example.com', 'Company Name');
-        $mailer->to($model->user->email, $model->user->name);
-        $mailer->subject('Thank you for your order.');
-        $mailer->mailable(new OrderMailable($model, 'template-name'));
-        $mailer->send();
+        $gmail = GoogleApi::gmail($client);
+        $gmail->from('email@example.com', 'Company Name');
+        $gmail->to($model->user->email, $model->user->name);
+        $gmail->subject('Thank you for your order.');
+        $gmail->mailable(new OrderMailable($model, 'template-name'));
+        $gmail->send();
     }
 ```
 
