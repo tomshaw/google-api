@@ -152,12 +152,6 @@ This packages includes a Google `Calendar` and `Gmail` adapter classes. Feel fre
     }
 ```
 
-## Session Lifetime
-
-The session lifetime in Laravel is specified in minutes. By default, this is typically set to 120 minutes (2 hours). After this period of inactivity, the session data will be considered 'expired' and will be deleted. However, please note that this is the 'idle time' limit. If a user continues to interact with your application, their session will remain active. If you want to change this, you can modify the `lifetime` value by setting the `SESSION_LIFETIME` environment variable in your `.env` file.
-
-> Remember storing sensitive information in sessions has risks and should be handled carefully, considering factors like session hijacking or fixation.
-
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
