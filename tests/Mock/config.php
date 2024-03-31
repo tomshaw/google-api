@@ -5,11 +5,11 @@ use Google\Service\Gmail;
 
 return [
     /**
-     * Sets how the token is stored.
+     * Set the default token storage adapter to use.
      *
-     * Valid values include "session" or "database".
+     * You can provide your own storage mechanism such as file or Redis by implementing the StorageAdapterInterface.
      */
-    'token_storage' => 'session',
+    'token_storage_adapter' => TomShaw\GoogleApi\Storage\SessionTokenStorage::class,
 
     /**
      * This structure should match the file downloaded from the "Download JSON" button on in the Google Developer Console.

@@ -3,16 +3,15 @@
 namespace TomShaw\GoogleApi;
 
 use Google\Client;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Contracts\GoogleClientInterface;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
-use TomShaw\GoogleApi\Models\GoogleToken;
 use TomShaw\GoogleApi\Resources\AccessTokenResource;
+use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 class GoogleClient implements GoogleClientInterface
 {
-    public const SESSION_KEY = 'google_api_token';
+    protected StorageAdapterInterface $tokenStorage;
 
     public static $rules = [
         'access_token' => 'required|string',
@@ -23,8 +22,9 @@ class GoogleClient implements GoogleClientInterface
         'created' => 'required|numeric',
     ];
 
-    public function __construct(protected Client $client)
-    {
+    public function __construct(
+        protected Client $client,
+    ) {
         if (! file_exists(config('google-api.auth_config'))) {
             throw new GoogleClientException('Unable to load client secrets.');
         }
@@ -42,6 +42,8 @@ class GoogleClient implements GoogleClientInterface
         $client->setAccessType(config('google-api.access_type'));
 
         $client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
+
+        $this->setStorage(app(config('google-api.token_storage_adapter')));
     }
 
     public function __invoke(): Client
@@ -52,11 +54,7 @@ class GoogleClient implements GoogleClientInterface
             throw new GoogleClientException('Invalid or missing token.');
         }
 
-        if ($accessToken instanceof Collection) {
-            $this->client->setAccessToken($accessToken->toArray());
-        } else {
-            $this->client->setAccessToken($accessToken->makeHidden(['id'])->toArray());
-        }
+        $this->client->setAccessToken($accessToken);
 
         if ($this->client->isAccessTokenExpired()) {
             $accessRefreshToken = $this->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
@@ -70,35 +68,34 @@ class GoogleClient implements GoogleClientInterface
         return $this->client;
     }
 
+    public function setStorage(StorageAdapterInterface $tokenStorage): self
+    {
+        if (! $tokenStorage instanceof StorageAdapterInterface) {
+            throw new GoogleClientException('Invalid token storage.');
+        }
+
+        $this->tokenStorage = $tokenStorage;
+
+        return $this;
+    }
+
+    public function getAccessToken(): ?array
+    {
+        return $this->tokenStorage->get();
+    }
+
+    public function setAccessToken(array $accessToken): self
+    {
+        $this->tokenStorage->set($accessToken);
+
+        return $this;
+    }
+
     public function createAuthUrl(): void
     {
         $authUrl = $this->client->createAuthUrl();
         header('Location: '.filter_var($authUrl, FILTER_SANITIZE_URL));
         exit;
-    }
-
-    public function getAccessToken(): GoogleToken|Collection|null
-    {
-        if (config('google-api.token_storage') === 'session') {
-            if (session()->has(self::SESSION_KEY)) {
-                return collect(session(self::SESSION_KEY));
-            } else {
-                return null;
-            }
-        } else {
-            return GoogleToken::first();
-        }
-    }
-
-    public function setAccessToken($accessToken): GoogleToken|bool
-    {
-        if (config('google-api.token_storage') === 'session') {
-            session([self::SESSION_KEY => $accessToken]);
-
-            return true;
-        } else {
-            return GoogleToken::firstOrCreate(['scope' => $accessToken['scope']], $accessToken);
-        }
     }
 
     public function fetchAccessTokenWithRefreshToken($refreshToken): array|bool

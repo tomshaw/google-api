@@ -26,13 +26,13 @@ If you're facing a timeout error then increase the timeout for composer:
 }
 ```
 
-You should publish the configuration file:
+Next publish the configuration file:
 
 ```
 php artisan vendor:publish --provider="TomShaw\GoogleApi\Providers\GoogleApiServiceProvider" --tag=config
 ```
 
-Run the migration if you wish to use database token storage:
+Run the migration if you wish to use database token storage adapter:
 
 ```
 php artisan migrate
@@ -58,7 +58,7 @@ To avoid shipping all 200 Google API's you should specify the services you wish 
 
 Here's a brief explanation of the application configuration file used to set up a Google API client:
 
-- `token_storage`: This is where the OAuth2.0 tokens will be stored. In this case, they are stored in the session.
+- `token_storage_adapter`: Sets the default token storage adapter to use. Developers can implement their own custom solution.
 
 - `auth_config`: This is the path to the JSON file that contains your Google API client credentials. 
 
@@ -111,9 +111,19 @@ class GoogleAuthController extends Controller
 }
 ```
 
-## Included Adapters
+## Storage Adapters
 
-This packages includes demonstration Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
+You can provide your own storage mechanism such as file or Redis by setting the `token_storage_adapter` configuration option.
+
+> Storage adapaters must implement the `StorageAdapterInterface`.
+
+```php
+'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseTokenStorage::class,
+```
+
+## Services Adapters
+
+This packages includes a Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
 
 > Using the client to fetch calendar events.
 
@@ -141,6 +151,12 @@ This packages includes demonstration Google `Calendar` and `Gmail` adapter class
         $gmail->send();
     }
 ```
+
+## Session Lifetime
+
+The session lifetime in Laravel is specified in minutes. By default, this is typically set to 120 minutes (2 hours). After this period of inactivity, the session data will be considered 'expired' and will be deleted. However, please note that this is the 'idle time' limit. If a user continues to interact with your application, their session will remain active. If you want to change this, you can modify the `lifetime` value by setting the `SESSION_LIFETIME` environment variable in your `.env` file.
+
+> Remember storing sensitive information in sessions has risks and should be handled carefully, considering factors like session hijacking or fixation.
 
 ## Contributing
 

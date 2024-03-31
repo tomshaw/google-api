@@ -2,16 +2,17 @@
 
 namespace TomShaw\GoogleApi\Contracts;
 
-use Illuminate\Support\Collection;
-use TomShaw\GoogleApi\Models\GoogleToken;
+use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 interface GoogleClientInterface
 {
+    public function setStorage(StorageAdapterInterface $tokenStorage): self;
+
+    public function getAccessToken(): ?array;
+
+    public function setAccessToken(array $accessToken): self;
+
     public function createAuthUrl(): void;
-
-    public function getAccessToken(): GoogleToken|Collection|null;
-
-    public function setAccessToken($accessToken): GoogleToken|bool;
 
     public function fetchAccessTokenWithRefreshToken($refreshToken): array|bool;
 
