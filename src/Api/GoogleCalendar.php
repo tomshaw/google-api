@@ -8,12 +8,9 @@ use Google\Service\Calendar\Event;
 use Google\Service\Calendar\EventDateTime;
 use Google\Service\Calendar\Events;
 use TomShaw\GoogleApi\GoogleClient;
-use TomShaw\GoogleApi\Traits\WithDates;
 
 final class GoogleCalendar
 {
-    use WithDates;
-
     protected Calendar $service;
 
     protected string $calendarId;
