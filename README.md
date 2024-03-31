@@ -125,14 +125,25 @@ You can provide your own storage mechanism such as file or Redis by setting the 
 
 This packages includes a Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
 
-> Using the client to fetch calendar events.
+> Using the client to create calendar events.
 
 ```php
-    public function mount(GoogleClient $client)
+    public function add(GoogleClient $client)
     {
         $calendar = GoogleApi::calendar($client);
+
         $calendar->setCalendarId('email@example.com');
-        $events = $calendar->listEvents()->getItems();
+
+        $summary = 'Test Event';
+        $location = '123 Test St, Test City, TS';
+        $description = 'This is a test event.';
+
+        $from = Carbon::now()->timezone('America/Chicago')->addDay()->startOfDay()->addHours(13);
+        $to = $from->copy()->addHour();
+
+        $event = $calendar->addEvent($summary, $location, $from, $to, $description);
+
+        // save event id for further use.
     }
 ```
 
