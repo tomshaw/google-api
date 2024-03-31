@@ -115,7 +115,7 @@ class GoogleAuthController extends Controller
 
 You can provide your own storage mechanism such as file or Redis by setting the `token_storage_adapter` configuration option.
 
-> Storage adapaters must implement the `StorageAdapterInterface`.
+> Storage adapters must implement the `StorageAdapterInterface`.
 
 ```php
 'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseTokenStorage::class,
