@@ -54,14 +54,19 @@ class GoogleClient implements GoogleClientInterface
             throw new GoogleClientException('Invalid or missing token.');
         }
 
-        $this->client->setAccessToken($accessToken);
+        try {
+            $this->client->setAccessToken($accessToken);
+        } catch (\Exception $e) {
+            throw new GoogleClientException($e->getMessage());
+        }
 
         if ($this->client->isAccessTokenExpired()) {
-            $accessRefreshToken = $this->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+            $accessToken = $this->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
 
-            if (is_array($accessRefreshToken)) {
-                $this->client->setAccessToken($accessRefreshToken);
-                $this->setAccessToken($accessRefreshToken);
+            if (is_array($accessToken)) {
+                $this->client->setAccessToken($accessToken);
+
+                $this->setAccessToken($accessToken);
             }
         }
 

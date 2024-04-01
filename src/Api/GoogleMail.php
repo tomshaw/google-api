@@ -20,7 +20,9 @@ final class GoogleMail
 
     protected ?string $toEmail;
 
-    protected array $ccList = [];
+    protected array $cc = [];
+
+    protected array $bCC = [];
 
     protected ?string $fromName;
 
@@ -84,50 +86,49 @@ final class GoogleMail
     }
 
     /**
-     * Sets the CC list.
+     * Sets the carbon copy emails.
      *
-     * @param  array  $ccList  The CC list to set.
+     * @param  array  $cc  The emails to set.
      * @return GoogleMail The current instance.
      */
-    public function setCC(array $ccList = []): GoogleMail
+    public function setCC(array $cc = []): GoogleMail
     {
-        $this->ccList = $ccList;
+        $this->cc = $cc;
 
         return $this;
     }
 
     /**
-     * Gets the CC list.
+     * Gets the carbon copy emails.
      *
-     * @return array The CC list.
+     * @return array The carbon copy emails.
      */
     public function getCC(): array
     {
-        return $this->ccList;
+        return $this->cc;
     }
 
     /**
-     * Gets the CC list as a string.
+     * Sets the blind carbon copy emails.
      *
-     * @return string The CC list as a string.
+     * @param  array  $bCC  The emails to set.
+     * @return GoogleMail The current instance.
      */
-    public function getCCString(): string
+    public function setBCC(array $bCC = []): GoogleMail
     {
-        $emails = [];
-
-        foreach ($this->ccList as $email) {
-            $emails[] = trim($email);
-        }
-
-        return implode(', ', $emails);
-    }
-
-    public function setFrom(string $email, string $name): GoogleMail
-    {
-        $this->setFromEmail($email);
-        $this->setFromName($name);
+        $this->bCC = $bCC;
 
         return $this;
+    }
+
+    /**
+     * Gets the blind carbon copy emails.
+     *
+     * @return array The blind carbon copy emails.
+     */
+    public function getBCC(): array
+    {
+        return $this->bCC;
     }
 
     /**
@@ -223,6 +224,21 @@ final class GoogleMail
     }
 
     /**
+     * Sets both 'from' name and email in one method call.
+     *
+     * @param  string  $email  The 'from' email to set.
+     * @param  string  $name  The 'from' name to set.
+     * @return GoogleMail The current instance.
+     */
+    public function from(string $email, string $name): GoogleMail
+    {
+        $this->setFromEmail($email);
+        $this->setFromName($name);
+
+        return $this;
+    }
+
+    /**
      * Sets both 'to' name and email in one method call.
      *
      * @param  string  $email  The 'to' email to set.
@@ -238,16 +254,35 @@ final class GoogleMail
     }
 
     /**
-     * Sets both 'from' name and email in one method call.
+     * Sets the carbon copy emails.
      *
-     * @param  string  $email  The 'from' email to set.
-     * @param  string  $name  The 'from' name to set.
+     * @param  string|array  $email  The email to set.
      * @return GoogleMail The current instance.
      */
-    public function from(string $email, string $name): GoogleMail
+    public function cc(string|array $email): GoogleMail
     {
-        $this->setFromEmail($email);
-        $this->setFromName($name);
+        if (is_array($email)) {
+            $this->cc = array_merge($this->cc, $email);
+        } else {
+            $this->cc[] = $email;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the blind carbon copy emails.
+     *
+     * @param  string|array  $email  The email to set.
+     * @return GoogleMail The current instance.
+     */
+    public function bcc(string|array $email): GoogleMail
+    {
+        if (is_array($email)) {
+            $this->bCC = array_merge($this->bCC, $email);
+        } else {
+            $this->bCC[] = $email;
+        }
 
         return $this;
     }
@@ -353,7 +388,10 @@ final class GoogleMail
         $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
         $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
         if (count($this->getCC())) {
-            $headers .= "CC: {$this->getCCString()}\r\n";
+            $headers .= "CC: {$this->arrayToString($validated['cc'])}\r\n";
+        }
+        if (count($this->getBCC())) {
+            $headers .= "BCC: {$this->arrayToString($validated['bcc'])}\r\n";
         }
         $headers .= "Subject: {$validated['subject']}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
@@ -424,6 +462,22 @@ final class GoogleMail
     }
 
     /**
+     * Converts the carbon copy emails to a string.
+     *
+     * @return string The carbon copy emails as a string.
+     */
+    public function arrayToString(array $emails): string
+    {
+        $data = [];
+
+        foreach ($emails as $email) {
+            $data[] = trim($email);
+        }
+
+        return implode(', ', $data);
+    }
+
+    /**
      * Validates the email message.
      *
      * @return array The validated data.
@@ -437,6 +491,8 @@ final class GoogleMail
             'toName' => $this->getToName(),
             'subject' => $this->getSubject(),
             'message' => $this->getMessage(),
+            'cc' => $this->getCC(),
+            'bcc' => $this->getBCC(),
         ], [
             'fromEmail' => 'required|email',
             'fromName' => 'required',
@@ -444,6 +500,10 @@ final class GoogleMail
             'toName' => 'required',
             'subject' => 'required',
             'message' => 'required',
+            'cc' => 'nullable|array',
+            'cc.*' => 'email',
+            'bcc' => 'nullable|array',
+            'bcc.*' => 'email',
         ]);
 
         if ($validator->fails()) {

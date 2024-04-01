@@ -67,17 +67,20 @@ final class GoogleCalendar
      * Adds a new event to the Google Calendar.
      *
      * @param  string  $summary  The summary of the event.
-     * @param  string  $location  The location of the event.
+     * @param  string|null  $location  The new location for the event.
+     * @param  string|null  $description  The new description for the event.
      * @param  Carbon  $from  The start time of the event.
      * @param  Carbon  $to  The end time of the event.
-     * @param  string|null  $description  The description of the event. If null, no description will be set.
      * @return Event The newly created event.
      */
-    public function addEvent(string $summary, string $location, Carbon $from, Carbon $to, ?string $description): Event
+    public function addEvent(string $summary, ?string $location, ?string $description, Carbon $from, Carbon $to): Event
     {
         $event = new Event();
         $event->setSummary($summary);
-        $event->setLocation($location);
+
+        if ($location) {
+            $event->setLocation($location);
+        }
 
         if ($description) {
             $event->setDescription($description);
@@ -99,17 +102,20 @@ final class GoogleCalendar
      *
      * @param  string  $eventId  The ID of the event to update.
      * @param  string  $summary  The new summary for the event.
-     * @param  string  $location  The new location for the event.
+     * @param  string|null  $location  The new location for the event.
+     * @param  string|null  $description  The new description for the event.
      * @param  Carbon  $from  The new start time for the event.
      * @param  Carbon  $to  The new end time for the event.
-     * @param  string|null  $description  The new description for the event. If null, the existing description will not be changed.
      * @return Event The updated event.
      */
-    public function updateEvent(string $eventId, string $summary, string $location, Carbon $from, Carbon $to, ?string $description): Event
+    public function updateEvent(string $eventId, string $summary, ?string $location, ?string $description, Carbon $from, Carbon $to): Event
     {
         $event = new Event($this->service->events->get($this->calendarId, $eventId));
         $event->setSummary($summary);
-        $event->setLocation($location);
+
+        if ($location) {
+            $event->setLocation($location);
+        }
 
         if ($description) {
             $event->setDescription($description);
