@@ -326,6 +326,10 @@ final class GoogleMail
      */
     public function send(): Message
     {
+        if (count($this->attachments)) {
+            $this->validateAttachments($this->attachments);
+        }
+
         $validated = $this->validateMessage();
 
         $message = $this->buildMessage($validated);
@@ -382,6 +386,34 @@ final class GoogleMail
         }
 
         return $headers;
+    }
+
+    /**
+     * Validates the email attachments.
+     *
+     * The maximum total size is set to 25MB, which is the limit for attachments sent through Gmail.
+     *
+     * @param  array  $attachments  The attachments to validate.
+     *
+     * @throws \Exception If the attachments are invalid.
+     */
+    protected function validateAttachments(array $attachments): void
+    {
+        $totalSize = 0;
+        $maxTotalSize = 25 * 1024 * 1024; // 25 MB
+
+        foreach ($attachments as $attachment) {
+            if (! file_exists($attachment)) {
+                throw new \Exception("File $attachment does not exist");
+            }
+            if (! is_readable($attachment)) {
+                throw new \Exception("File $attachment is not readable");
+            }
+            $totalSize += filesize($attachment);
+        }
+        if ($totalSize > $maxTotalSize) {
+            throw new \Exception('Total size of attachments exceeds the maximum size limit');
+        }
     }
 
     /**
