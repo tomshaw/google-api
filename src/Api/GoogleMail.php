@@ -357,23 +357,29 @@ final class GoogleMail
         }
         $headers .= "Subject: {$validated['subject']}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n";
 
-        foreach ($this->attachments as $attachment) {
-            $attachmentData = base64_encode(file_get_contents($attachment));
+        if (! empty($this->attachments)) {
+            $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n";
+
+            foreach ($this->attachments as $attachment) {
+                $attachmentData = base64_encode(file_get_contents($attachment));
+
+                $headers .= "--$boundary\r\n";
+                $headers .= 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n";
+                $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
+                $headers .= $attachmentData."\r\n\r\n";
+            }
 
             $headers .= "--$boundary\r\n";
-            $headers .= 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n";
-            $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
-            $headers .= $attachmentData."\r\n\r\n";
         }
 
-        $headers .= "--$boundary\r\n";
         $headers .= "Content-Type: text/html; charset=utf-8\r\n";
         $headers .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
         $headers .= "{$validated['message']}\r\n\r\n";
 
-        $headers .= "--$boundary--";
+        if (! empty($this->attachments)) {
+            $headers .= "--$boundary--";
+        }
 
         return $headers;
     }
