@@ -349,7 +349,7 @@ final class GoogleMail
         $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
         $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
         if (count($this->getCC())) {
-            $headers .= "CC: {$validated['ccListString']}\r\n";
+            $headers .= "CC: {$this->getCCString()}\r\n";
         }
         $headers .= "Subject: {$validated['subject']}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
