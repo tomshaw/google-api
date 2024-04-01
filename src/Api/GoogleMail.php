@@ -5,6 +5,7 @@ namespace TomShaw\GoogleApi\Api;
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
 
@@ -28,6 +29,8 @@ final class GoogleMail
     protected ?string $subject;
 
     protected ?string $message;
+
+    protected array $attachments = [];
 
     public function __construct(protected GoogleClient $client)
     {
@@ -291,84 +294,134 @@ final class GoogleMail
     }
 
     /**
-     * Sends an email message.
+     * Add a single email attachment.
      *
-     * @return Message Returns the sent message.
+     * @param  string  $path  The path to the attachment.
+     * @return GoogleMail The current instance.
+     */
+    public function attachment(string $path): self
+    {
+        $this->attachments[] = $path;
+
+        return $this;
+    }
+
+    /**
+     * Add an array of email attachments.
      *
-     * @throws GoogleApiException If any of the required fields (From name and email, To name and email, subject, message) are missing.
+     * @param  array  $paths  The path to the attachment.
+     * @return GoogleMail The current instance.
+     */
+    public function attachments(array $paths): self
+    {
+        $this->attachments = $paths;
+
+        return $this;
+    }
+
+    /**
+     * Sends the email.
+     *
+     * @return Message The message object.
      */
     public function send(): Message
     {
-        $fromEmail = $this->getFromEmail();
-        $fromName = $this->getFromName();
+        $validated = $this->validateMessage();
 
-        $toEmail = $this->getToEmail();
-        $toName = $this->getToName();
-
-        $ccListString = $this->getCCString();
-
-        $subject = $this->getSubject();
-        $message = $this->getMessage();
-
-        if (! $fromEmail || ! $fromName) {
-            throw new GoogleApiException('Both from name and email are required.');
-        }
-
-        if (! $toEmail || ! $toName) {
-            throw new GoogleApiException('Both to name and email are required.');
-        }
-
-        if (! $subject) {
-            throw new GoogleApiException('An email subject is required.');
-        }
-
-        if (! $message) {
-            throw new GoogleApiException('The email message is required.');
-        }
-
-        $message = $this->buildMessage($fromEmail, $fromName, $toEmail, $toName, $ccListString, $subject, $message);
+        $message = $this->buildMessage($validated);
 
         $msg = new Message();
-        $msg->setRaw($message);
+        $msg->setRaw($this->encodeUrlSafeMessage($message));
 
         return $this->service->users_messages->send('me', $msg);
     }
 
-    protected function buildMessage(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccListString, string $subject, string $message): string
+    /**
+     * Builds the email message.
+     *
+     * @param  array  $validated  The validated data.
+     * @return string The email message.
+     */
+    protected function buildMessage(array $validated): string
     {
-        $headers = "From: $fromName <$fromEmail>\r\n";
-        $headers .= "To: $toName <$toEmail>\r\n";
-        if (count($this->getCC())) {
-            $headers .= "CC: {$ccListString}\r\n";
-        }
-        $headers .= "Subject: $subject\r\n";
-        $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=utf-8\r\n";
-        $headers .= 'Content-Transfer-Encoding: 8bit'."\r\n\r\n";
-        $headers .= $message;
+        $boundary = md5(time());
 
-        return base64_encode($headers);
+        $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
+        $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
+        if (count($this->getCC())) {
+            $headers .= "CC: {$validated['ccListString']}\r\n";
+        }
+        $headers .= "Subject: {$validated['subject']}\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+
+        if (! empty($this->attachments)) {
+            $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n";
+
+            // Add the text part
+            $headers .= "--$boundary\r\n";
+            $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+            $headers .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+            $headers .= "{$validated['message']}\r\n\r\n";
+
+            // Add each attachment
+            foreach ($this->attachments as $attachment) {
+                $attachmentData = base64_encode(file_get_contents($attachment));
+
+                $headers .= "--$boundary\r\n";
+                $headers .= 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n";
+                $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
+                $headers .= $attachmentData."\r\n\r\n";
+            }
+
+            // End the email
+            $headers .= "--$boundary--";
+        } else {
+            $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+            $headers .= 'Content-Transfer-Encoding: 8bit'."\r\n\r\n";
+            $headers .= $validated['message'];
+        }
+
+        return $headers;
     }
 
-    protected function buildMessageBinary(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccListString, string $subject, string $message, string $contentType): string
-    {
-        $headers = "From: $fromName <$fromEmail>\r\n";
-        $headers .= "To: $toName <$toEmail>\r\n";
-        if (count($this->getCC())) {
-            $headers .= "CC: {$ccListString}\r\n";
-        }
-        $headers .= 'Subject: =?utf-8?B?'.base64_encode($subject)."?=\r\n";
-        $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: $contentType\r\n";
-        $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
-
-        $encodedMessage = base64_encode($message);
-
-        return $headers.$encodedMessage;
-    }
-
+    /**
+     * Encodes a message into a URL-safe format.
+     *
+     * @param  string  $message  The message to encode.
+     * @return string The encoded message.
+     */
     protected function encodeUrlSafeMessage(string $message): string
     {
         return rtrim(strtr(base64_encode($message), '+/', '-_'), '=');
+    }
+
+    /**
+     * Validates the email message.
+     *
+     * @return array The validated data.
+     */
+    protected function validateMessage(): array
+    {
+        $validator = Validator::make([
+            'fromEmail' => $this->getFromEmail(),
+            'fromName' => $this->getFromName(),
+            'toEmail' => $this->getToEmail(),
+            'toName' => $this->getToName(),
+            'subject' => $this->getSubject(),
+            'message' => $this->getMessage(),
+        ], [
+            'fromEmail' => 'required|email',
+            'fromName' => 'required',
+            'toEmail' => 'required|email',
+            'toName' => 'required',
+            'subject' => 'required',
+            'message' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            throw new GoogleApiException($validator->errors()->first());
+        }
+
+        return $validator->validated();
     }
 }
