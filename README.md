@@ -141,7 +141,7 @@ This packages includes a Google `Calendar` and `Gmail` adapter classes. Feel fre
         $from = Carbon::now()->timezone('America/Chicago')->addDay()->startOfDay()->addHours(13);
         $to = $from->copy()->addHour();
 
-        $event = $calendar->addEvent($summary, $location, $from, $to, $description);
+        $event = $calendar->addEvent($summary, $location, $description, $from, $to);
 
         // save event id for further use.
     }
