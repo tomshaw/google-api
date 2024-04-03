@@ -6,7 +6,7 @@
 ![stars](https://img.shields.io/github/stars/tomshaw/google-api?style=flat&logo=appveyor)
 [![GitHub license](https://img.shields.io/github/license/tomshaw/google-api)](https://github.com/tomshaw/google-api/blob/master/LICENSE)
 
-A Laravel Service Google API Client.
+A Google OAuth 2.0 Laravel Service Client.
 
 ## Installation
 
@@ -80,7 +80,7 @@ The Google API client uses these settings to handle the OAuth2.0 flow and intera
 
 Authorizing the application and persisting the token.
 
-> Note: Google APIs must have OAuth 2.0 authorization credentials downloaded from the [Google Developer Console](https://console.cloud.google.com/apis). See the application configuration to specify the downloaded location of your credentials. 
+> Google APIs must have OAuth 2.0 authorization credentials downloaded from the [Google Developer Console](https://console.cloud.google.com/apis). See the application configuration to specify the location of your credentials. 
 
 ```php
 namespace App\Http\Controllers;
@@ -123,9 +123,9 @@ You can provide your own storage mechanism such as file or Redis by setting the 
 
 ## Services Adapters
 
-This packages includes a Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
+This package includes a Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
 
-> Using the client to create calendar events.
+> Using the client to create a calendar event for the following day 1:00PM.
 
 ```php
     public function add(GoogleClient $client)
@@ -143,16 +143,16 @@ This packages includes a Google `Calendar` and `Gmail` adapter classes. Feel fre
 
         $event = $calendar->addEvent($summary, $location, $description, $from, $to);
 
-        // save event id for further use.
+        // save event id for event updates.
     }
 ```
 
 > Using the client to send emails.
 
 ```php
-    public function mount(GoogleClient $client)
+    public function mount(GoogleClient $client, Order $id)
     {
-        $model = Order::with(['user'])->where('id', $orderId)->first();
+        $model = Order::with(['user'])->where('id', $id)->first();
         
         $attachments = [
             storage_path('app/public/discount.jpg'),
