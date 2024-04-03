@@ -4,7 +4,9 @@
     "keywords": [
         "google",
         "laravel",
-        "livewire"
+        "google-api",
+        "google-client",
+        "api-client"
     ],
     "license": "MIT",
     "authors": [
