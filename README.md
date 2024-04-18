@@ -169,6 +169,10 @@ This package includes a Google `Calendar` and `Gmail` adapter classes. Feel free
     }
 ```
 
+## Changelog
+
+For changes made to the project, see the [Changelog](CHANGELOG.md).
+
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
