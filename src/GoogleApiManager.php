@@ -7,13 +7,13 @@ use TomShaw\GoogleApi\Api\GoogleMail;
 
 class GoogleApiManager
 {
-    public function gmail(GoogleClient $client): GoogleMail
+    public function gmail(): GoogleMail
     {
-        return new GoogleMail($client);
+        return new GoogleMail(app(GoogleClient::class));
     }
 
-    public function calendar(GoogleClient $client): GoogleCalendar
+    public function calendar(): GoogleCalendar
     {
-        return new GoogleCalendar($client);
+        return new GoogleCalendar(app(GoogleClient::class));
     }
 }

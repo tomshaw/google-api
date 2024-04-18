@@ -128,11 +128,9 @@ This package includes a Google `Calendar` and `Gmail` adapter classes. Feel free
 > Using the client to create a calendar event for the following day 1:00PM.
 
 ```php
-    public function add(GoogleClient $client)
+    public function add()
     {
-        $calendar = GoogleApi::calendar($client);
-
-        $calendar->setCalendarId('email@example.com');
+        $calendar = GoogleApi::calendar()->setCalendarId('email@example.com');
 
         $summary = 'Test Event';
         $location = '123 Test St, Test City, TS';
@@ -150,7 +148,7 @@ This package includes a Google `Calendar` and `Gmail` adapter classes. Feel free
 > Using the client to send emails.
 
 ```php
-    public function mount(GoogleClient $client, Order $id)
+    public function mount(Order $id)
     {
         $model = Order::with(['user'])->where('id', $id)->first();
         
@@ -159,7 +157,7 @@ This package includes a Google `Calendar` and `Gmail` adapter classes. Feel free
             storage_path('app/public/invoice.pdf'),
         ];
 
-        $gmail = GoogleApi::gmail($client);
+        $gmail = GoogleApi::gmail();
         $gmail->from('email@example.com', 'Company Name');
         $gmail->to($model->user->email, $model->user->name);
         $gmail->cc('sales@example.com');
