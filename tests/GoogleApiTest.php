@@ -3,10 +3,10 @@
 use Google\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
-use TomShaw\GoogleApi\Resources\GoogleCalendar;
-use TomShaw\GoogleApi\Resources\GoogleMail;
 use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\GoogleClient;
+use TomShaw\GoogleApi\Resources\GoogleCalendar;
+use TomShaw\GoogleApi\Resources\GoogleMail;
 use TomShaw\GoogleApi\Storage\SessionStorageAdapter;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 

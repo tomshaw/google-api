@@ -53,5 +53,6 @@ return [
         Google\Service\Calendar::CALENDAR,
         Google\Service\Gmail::GMAIL_SEND,
         Google\Service\Books::BOOKS,
+        Google\Service\Drive::DRIVE,
     ],
 ];
