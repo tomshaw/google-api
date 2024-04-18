@@ -18,10 +18,8 @@ class SessionStorageAdapter implements StorageAdapterInterface
         return session()->get(self::SESSION_KEY);
     }
 
-    public function delete(): null
+    public function delete(): void
     {
         session()->forget(self::SESSION_KEY);
-
-        return null;
     }
 }

@@ -18,10 +18,8 @@ class DatabaseStorageAdapter implements StorageAdapterInterface
         return GoogleToken::where('user_id', auth()->id())->first();
     }
 
-    public function delete(): null
+    public function delete(): void
     {
         GoogleToken::where('user_id', auth()->id())->delete();
-
-        return null;
     }
 }

@@ -103,9 +103,9 @@ class GoogleClient
         return $this;
     }
 
-    public function deleteAccessToken(): null
+    public function deleteAccessToken(): void
     {
-        return $this->getStorage()->delete();
+        $this->getStorage()->delete();
     }
 
     public function isEmpty(): bool

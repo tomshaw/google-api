@@ -8,5 +8,5 @@ interface StorageAdapterInterface
 
     public function get(): mixed;
 
-    public function delete(): null;
+    public function delete(): void;
 }
