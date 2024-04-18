@@ -11,7 +11,7 @@ use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 class GoogleClient implements GoogleClientInterface
 {
-    protected StorageAdapterInterface $tokenStorage;
+    protected StorageAdapterInterface $storageAdapter;
 
     public static $rules = [
         'access_token' => 'required|string',
@@ -73,25 +73,30 @@ class GoogleClient implements GoogleClientInterface
         return $this->client;
     }
 
-    public function setStorage(StorageAdapterInterface $tokenStorage): self
+    public function setStorage(StorageAdapterInterface $storageAdapter): self
     {
-        if (! $tokenStorage instanceof StorageAdapterInterface) {
+        if (! $storageAdapter instanceof StorageAdapterInterface) {
             throw new GoogleClientException('Invalid token storage.');
         }
 
-        $this->tokenStorage = $tokenStorage;
+        $this->storageAdapter = $storageAdapter;
 
         return $this;
     }
 
+    public function getStorage(): StorageAdapterInterface
+    {
+        return $this->storageAdapter;
+    }
+
     public function getAccessToken(): ?array
     {
-        return $this->tokenStorage->get();
+        return $this->storageAdapter->get();
     }
 
     public function setAccessToken(array $accessToken): self
     {
-        $this->tokenStorage->set($accessToken);
+        $this->storageAdapter->set($accessToken);
 
         return $this;
     }

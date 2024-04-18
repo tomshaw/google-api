@@ -8,6 +8,7 @@ use TomShaw\GoogleApi\Api\GoogleMail;
 use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Storage\SessionTokenStorage;
+use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 test('instance check', function () {
     $this->assertTrue($this instanceof \PHPUnit\Framework\TestCase);
@@ -24,8 +25,7 @@ beforeEach(function () {
 
     Config::set('google-api', require realpath(__DIR__.DIRECTORY_SEPARATOR.'Mock'.DIRECTORY_SEPARATOR.'config.php'));
 
-    $this->client = new Client();
-    $this->googleClient = new GoogleClient($this->client);
+    $this->client = new GoogleClient(new Client());
 });
 
 afterEach(function () {
@@ -35,7 +35,7 @@ afterEach(function () {
 it('returns null when no access token is set', function () {
     Session::forget(SessionTokenStorage::SESSION_KEY);
 
-    $result = $this->googleClient->getAccessToken();
+    $result = $this->client->getAccessToken();
 
     expect($result)->toBeNull();
 });
@@ -43,17 +43,27 @@ it('returns null when no access token is set', function () {
 it('returns session token when token is set in session', function () {
     Session::put(SessionTokenStorage::SESSION_KEY, ['access_token' => 'test_token']);
 
-    $result = $this->googleClient->getAccessToken();
+    $result = $this->client->getAccessToken();
 
     expect($result)->toBeArray()->and($result['access_token'])->toBe('test_token');
 });
 
 it('sets access token in session', function () {
-    $this->googleClient->setAccessToken(['access_token' => 'test_token']);
+    $this->client->setAccessToken(['access_token' => 'test_token']);
 
     $token = Session::get(SessionTokenStorage::SESSION_KEY);
 
     expect($token)->toBeArray()->and($token['access_token'])->toBe('test_token');
+});
+
+it('sets and gets the storage adapter correctly', function () {
+    $mockStorageAdapter = \Mockery::mock(StorageAdapterInterface::class);
+
+    $this->client->setStorage($mockStorageAdapter);
+
+    $result = $this->client->getStorage();
+
+    expect($result)->toBe($mockStorageAdapter);
 });
 
 it('returns GoogleMail instance', function () {
@@ -66,7 +76,7 @@ it('returns GoogleMail instance', function () {
         'created' => time(),
     ]);
 
-    $result = GoogleApi::gmail($this->googleClient);
+    $result = GoogleApi::gmail($this->client);
 
     expect($result)->toBeInstanceOf(GoogleMail::class);
 });
@@ -81,7 +91,7 @@ it('returns GoogleCalendar instance', function () {
         'created' => time(),
     ]);
 
-    $result = GoogleApi::calendar($this->googleClient);
+    $result = GoogleApi::calendar($this->client);
 
     expect($result)->toBeInstanceOf(GoogleCalendar::class);
 });
