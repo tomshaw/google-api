@@ -1,6 +1,6 @@
 <?php
 
-namespace TomShaw\GoogleApi\Api;
+namespace TomShaw\GoogleApi\Resources;
 
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
 
-/**
- * Class GoogleMail
- */
 final class GoogleMail
 {
     protected Gmail $service;

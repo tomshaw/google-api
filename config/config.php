@@ -52,5 +52,6 @@ return [
     'service_scopes' => [
         Google\Service\Calendar::CALENDAR,
         Google\Service\Gmail::GMAIL_SEND,
+        Google\Service\Books::BOOKS,
     ],
 ];

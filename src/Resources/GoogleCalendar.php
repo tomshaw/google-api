@@ -1,6 +1,6 @@
 <?php
 
-namespace TomShaw\GoogleApi\Api;
+namespace TomShaw\GoogleApi\Resources;
 
 use Carbon\Carbon;
 use Google\Service\Calendar;

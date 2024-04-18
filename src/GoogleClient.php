@@ -5,8 +5,8 @@ namespace TomShaw\GoogleApi;
 use Google\Client;
 use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
+use TomShaw\GoogleApi\Http\Resources\AccessTokenResource;
 use TomShaw\GoogleApi\Models\StorageCollection;
-use TomShaw\GoogleApi\Resources\AccessTokenResource;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 class GoogleClient

@@ -2,11 +2,17 @@
 
 namespace TomShaw\GoogleApi;
 
-use TomShaw\GoogleApi\Api\GoogleCalendar;
-use TomShaw\GoogleApi\Api\GoogleMail;
+use TomShaw\GoogleApi\Resources\GoogleBooks;
+use TomShaw\GoogleApi\Resources\GoogleCalendar;
+use TomShaw\GoogleApi\Resources\GoogleMail;
 
 class GoogleApiManager
 {
+    public function books(): GoogleBooks
+    {
+        return new GoogleBooks(app(GoogleClient::class));
+    }
+
     public function gmail(): GoogleMail
     {
         return new GoogleMail(app(GoogleClient::class));
