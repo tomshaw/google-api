@@ -6,7 +6,7 @@ return [
      *
      * You can provide your own storage mechanism such as file or Redis by implementing the StorageAdapterInterface.
      */
-    'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseTokenStorage::class,
+    'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseStorageAdapter::class,
 
     /**
      * This structure should match the file downloaded from the "Download JSON" button on in the Google Developer Console.

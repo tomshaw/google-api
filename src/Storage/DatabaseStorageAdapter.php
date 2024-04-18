@@ -4,7 +4,7 @@ namespace TomShaw\GoogleApi\Storage;
 
 use TomShaw\GoogleApi\Models\GoogleToken;
 
-class DatabaseTokenStorage implements StorageAdapterInterface
+class DatabaseStorageAdapter implements StorageAdapterInterface
 {
     public function set(array $accessToken): self
     {
@@ -13,15 +13,15 @@ class DatabaseTokenStorage implements StorageAdapterInterface
         return $this;
     }
 
-    public function get(): ?array
+    public function get(): ?GoogleToken
     {
-        $token = GoogleToken::where('user_id', auth()->id())->first();
-
-        return $token ? $token->toArray() : null;
+        return GoogleToken::where('user_id', auth()->id())->first();
     }
 
-    public function delete(): void
+    public function delete(): null
     {
-        GoogleToken::truncate();
+        GoogleToken::where('user_id', auth()->id())->delete();
+
+        return null;
     }
 }

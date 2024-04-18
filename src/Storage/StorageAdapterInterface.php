@@ -6,7 +6,7 @@ interface StorageAdapterInterface
 {
     public function set(array $accessToken): self;
 
-    public function get(): ?array;
+    public function get(): mixed;
 
-    public function delete(): void;
+    public function delete(): null;
 }

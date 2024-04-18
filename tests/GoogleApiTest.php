@@ -7,7 +7,7 @@ use TomShaw\GoogleApi\Api\GoogleCalendar;
 use TomShaw\GoogleApi\Api\GoogleMail;
 use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\GoogleClient;
-use TomShaw\GoogleApi\Storage\SessionTokenStorage;
+use TomShaw\GoogleApi\Storage\SessionStorageAdapter;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 test('instance check', function () {
@@ -33,27 +33,19 @@ afterEach(function () {
 });
 
 it('returns null when no access token is set', function () {
-    Session::forget(SessionTokenStorage::SESSION_KEY);
+    $this->client->deleteAccessToken();
 
     $result = $this->client->getAccessToken();
 
-    expect($result)->toBeNull();
+    expect($result->isEmpty())->toBeTrue();
 });
 
-it('returns session token when token is set in session', function () {
-    Session::put(SessionTokenStorage::SESSION_KEY, ['access_token' => 'test_token']);
-
-    $result = $this->client->getAccessToken();
-
-    expect($result)->toBeArray()->and($result['access_token'])->toBe('test_token');
-});
-
-it('sets access token in session', function () {
+it('returns access token when token is set', function () {
     $this->client->setAccessToken(['access_token' => 'test_token']);
 
-    $token = Session::get(SessionTokenStorage::SESSION_KEY);
+    $result = $this->client->getAccessToken()->toArray();
 
-    expect($token)->toBeArray()->and($token['access_token'])->toBe('test_token');
+    expect($result)->toBeArray()->and($result['access_token'])->toBe('test_token');
 });
 
 it('sets and gets the storage adapter correctly', function () {
@@ -67,7 +59,8 @@ it('sets and gets the storage adapter correctly', function () {
 });
 
 it('returns GoogleMail instance', function () {
-    Session::put(SessionTokenStorage::SESSION_KEY, [
+
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
         'access_token' => 'test_token',
         'refresh_token' => 'dummy_refresh_token',
         'expires_in' => 3600,
@@ -76,13 +69,14 @@ it('returns GoogleMail instance', function () {
         'created' => time(),
     ]);
 
-    $result = GoogleApi::gmail($this->client);
+    $result = GoogleApi::gmail();
 
     expect($result)->toBeInstanceOf(GoogleMail::class);
 });
 
 it('returns GoogleCalendar instance', function () {
-    Session::put(SessionTokenStorage::SESSION_KEY, [
+
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
         'access_token' => 'test_token',
         'refresh_token' => 'dummy_refresh_token',
         'expires_in' => 3600,
@@ -91,7 +85,7 @@ it('returns GoogleCalendar instance', function () {
         'created' => time(),
     ]);
 
-    $result = GoogleApi::calendar($this->client);
+    $result = GoogleApi::calendar();
 
     expect($result)->toBeInstanceOf(GoogleCalendar::class);
 });

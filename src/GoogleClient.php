@@ -4,12 +4,12 @@ namespace TomShaw\GoogleApi;
 
 use Google\Client;
 use Illuminate\Support\Facades\Validator;
-use TomShaw\GoogleApi\Contracts\GoogleClientInterface;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
+use TomShaw\GoogleApi\Models\StorageCollection;
 use TomShaw\GoogleApi\Resources\AccessTokenResource;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
-class GoogleClient implements GoogleClientInterface
+class GoogleClient
 {
     protected StorageAdapterInterface $storageAdapter;
 
@@ -46,16 +46,18 @@ class GoogleClient implements GoogleClientInterface
         $this->setStorage(app(config('google-api.token_storage_adapter')));
     }
 
-    public function __invoke(): Client
+    public function __invoke(): ?Client
     {
         $accessToken = $this->getAccessToken();
 
-        if (! $accessToken) {
-            throw new GoogleClientException('Invalid or missing token.');
+        if ($accessToken->isEmpty()) {
+            $this->createAuthUrl();
+
+            return null;
         }
 
         try {
-            $this->client->setAccessToken($accessToken);
+            $this->client->setAccessToken($accessToken->toArray());
         } catch (\Exception $e) {
             throw new GoogleClientException($e->getMessage());
         }
@@ -89,9 +91,9 @@ class GoogleClient implements GoogleClientInterface
         return $this->storageAdapter;
     }
 
-    public function getAccessToken(): ?array
+    public function getAccessToken(): StorageCollection
     {
-        return $this->storageAdapter->get();
+        return new StorageCollection($this->getStorage()->get());
     }
 
     public function setAccessToken(array $accessToken): self
@@ -99,6 +101,21 @@ class GoogleClient implements GoogleClientInterface
         $this->storageAdapter->set($accessToken);
 
         return $this;
+    }
+
+    public function deleteAccessToken(): null
+    {
+        return $this->getStorage()->delete();
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->getAccessToken()->isEmpty();
+    }
+
+    public function isNotEmpty(): bool
+    {
+        return $this->getAccessToken()->isNotEmpty();
     }
 
     public function createAuthUrl(): void

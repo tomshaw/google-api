@@ -2,7 +2,7 @@
 
 namespace TomShaw\GoogleApi\Storage;
 
-class SessionTokenStorage implements StorageAdapterInterface
+class SessionStorageAdapter implements StorageAdapterInterface
 {
     public const SESSION_KEY = 'google_api_token';
 
@@ -18,8 +18,10 @@ class SessionTokenStorage implements StorageAdapterInterface
         return session()->get(self::SESSION_KEY);
     }
 
-    public function delete(): void
+    public function delete(): null
     {
         session()->forget(self::SESSION_KEY);
+
+        return null;
     }
 }
