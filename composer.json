@@ -40,10 +40,10 @@
             "TomShaw\\GoogleApi\\Tests\\": "tests"
         }
     },
-    "scripts" : {
-        "analyse" : "vendor/bin/phpstan analyse",
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
         "baseline": "vendor/bin/phpstan analyse --ansi --memory-limit=-1 --generate-baseline --allow-empty-baseline",
-        "test" : "vendor/bin/pest",
+        "test": "vendor/bin/pest",
         "format": "vendor/bin/pint --config pint.json"
     },
     "extra": {
@@ -53,8 +53,8 @@
             ]
         }
     },
-    "minimum-stability" : "dev",
-    "prefer-stable" : true,
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
