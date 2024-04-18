@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.5.0](https://github.com/tomshaw/google-api/compare/v0.4.0...v0.5.0) (2024-04-18)
+
+
+### Features
+
+* refactor deleteAccessToken method in GoogleClient ([1b07e23](https://github.com/tomshaw/google-api/commit/1b07e23945d3684cab081cea388552a2fd81cd55))
+
 ## [0.4.0](https://github.com/tomshaw/google-api/compare/v0.3.2...v0.4.0) (2024-04-18)
 
 
