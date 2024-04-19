@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.6.1](https://github.com/tomshaw/google-api/compare/v0.6.0...v0.6.1) (2024-04-19)
+
+
+### Bug Fixes
+
+* Wrong link in Github issue template. ([3c61b62](https://github.com/tomshaw/google-api/commit/3c61b62e4172672852f0f204b4f59896ddba5fe6))
+
 ## [0.6.0](https://github.com/tomshaw/google-api/compare/v0.5.0...v0.6.0) (2024-04-18)
 
 
