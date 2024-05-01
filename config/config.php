@@ -50,9 +50,9 @@ return [
      * Scopes to be requested as part of the OAuth2.0 flow.
      */
     'service_scopes' => [
-        Google\Service\Calendar::CALENDAR,
-        Google\Service\Gmail::GMAIL_SEND,
-        Google\Service\Books::BOOKS,
-        Google\Service\Drive::DRIVE,
+        // Google\Service\Calendar::CALENDAR,
+        // Google\Service\Gmail::GMAIL_SEND,
+        // Google\Service\Books::BOOKS,
+        // Google\Service\Drive::DRIVE,
     ],
 ];
