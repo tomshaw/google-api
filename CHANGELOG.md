@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.6.2](https://github.com/tomshaw/google-api/compare/v0.6.1...v0.6.2) (2024-05-01)
+
+
+### Bug Fixes
+
+* uncomment services in config.php, closes [#10](https://github.com/tomshaw/google-api/issues/10) ([299a980](https://github.com/tomshaw/google-api/commit/299a980d4de29a689c137d302f32bb294a17a7be))
+
 ## [0.6.1](https://github.com/tomshaw/google-api/compare/v0.6.0...v0.6.1) (2024-04-19)
 
 
