@@ -2,6 +2,20 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.7.1](https://github.com/tomshaw/google-api/compare/v0.7.0...v0.7.1) (2025-02-02)
+
+
+### Bug Fixes
+
+* Google API client version adjustment. ([57c8907](https://github.com/tomshaw/google-api/commit/57c8907cebe94ada04c70f53f23904a73cfc48b4))
+
+
+### Miscellaneous Chores
+
+* **master:** release 0.7.0 ([2f6a8cb](https://github.com/tomshaw/google-api/commit/2f6a8cb812d189ba4c64182db50acd6fa2bf98bf))
+* release 0.7.0 ([5b8a337](https://github.com/tomshaw/google-api/commit/5b8a3372dae8055a31e9aa9fd3a340de86924edd))
+* release 0.7.1 ([abd3b06](https://github.com/tomshaw/google-api/commit/abd3b063e7c4f3e657dd9d0342e0d40e45b6e535))
+
 ## [0.7.0](https://github.com/tomshaw/google-api/compare/v0.6.2...v0.7.0) (2025-02-02)
 
 
