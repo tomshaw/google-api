@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": "^8.1|^8.2|^8.3|^8.4",
-        "google/apiclient": "^2.18.2",
+        "google/apiclient": "^2.18",
         "illuminate/session": "^10.14|^11.0"
     },
     "require-dev": {
