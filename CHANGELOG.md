@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.7.3](https://github.com/tomshaw/google-api/compare/v0.7.2...v0.7.3) (2025-02-03)
+
+
+### Miscellaneous Chores
+
+* **deps:** add support for PHP 8.3 and 8.4 in composer.json ([be677e7](https://github.com/tomshaw/google-api/commit/be677e711079f6b284347c5f31fd7035f772b366))
+
 ## [0.7.2](https://github.com/tomshaw/google-api/compare/v0.7.1...v0.7.2) (2025-02-03)
 
 
