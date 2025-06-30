@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.8.0](https://github.com/tomshaw/google-api/compare/v0.7.3...v0.8.0) (2025-06-30)
+
+
+### Features
+
+* **issue-templates:** add comprehensive issue templates for bug reports, feature requests, documentation issues, improvements, and questions ([36f9d90](https://github.com/tomshaw/google-api/commit/36f9d90b45b9f5ecce8c29737286a5b897befb97))
+
 ## [0.7.3](https://github.com/tomshaw/google-api/compare/v0.7.2...v0.7.3) (2025-02-03)
 
 
