@@ -19,13 +19,13 @@
     "require": {
         "php": "^8.2|^8.3|^8.4",
         "google/apiclient": "^2.18",
-        "illuminate/session": "^10.14|^11.0"
+        "illuminate/session": "^10.14|^11.0|^12.0"
     },
     "require-dev": {
         "larastan/larastan": "^2.9",
         "laravel/pint": "^1.10|^2.0",
         "mockery/mockery": "^1.4.4",
-        "orchestra/testbench": "^8.5|^9.0",
+        "orchestra/testbench": "^8.5|^9.0|^10.0",
         "pestphp/pest": "^2.8|^3.0",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.1.1|^11.0"
