@@ -1,0 +1,42 @@
+name: Question / Help
+description: Ask a question or get clarification about the project.
+title: "[QUESTION]: "
+labels: ["question", "triage"]
+assignees: []
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: 📌 Summary
+      description: "Short summary of your question. This appears in the issue list preview."
+      placeholder: "How to configure the API client for custom domains?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: question_details
+    attributes:
+      label: ❓ Details
+      description: "Describe your question, what you’re trying to do, and where you’re stuck."
+      placeholder: "I’m trying to connect to the API with a custom domain, but getting a 403 error."
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 🛠️ What have you tried?
+      description: "List any docs, code, or troubleshooting you’ve done so far."
+      placeholder: "Checked the README, tried setting the API_BASE_URL variable, etc."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 💬 Additional Context
+      description: "Any other information, screenshots, or logs?"
+      placeholder: ""
+    validations:
+      required: false

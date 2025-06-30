@@ -1,0 +1,64 @@
+name: Bug Report
+description: Report a bug, crash, or unexpected behavior.
+title: "[BUG]: "
+labels: ["bug", "triage"]
+assignees: []
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: 📌 Summary
+      description: "Brief one-liner describing the bug. This appears in the issue list preview."
+      placeholder: "Login form crashes when submitting invalid credentials."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🔁 Steps to Reproduce
+      description: "Clearly describe how to reproduce the issue."
+      placeholder: |
+        1. Go to /login
+        2. Enter invalid credentials
+        3. Click Submit
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: ❌ Actual Behavior
+      description: "What happens instead of the expected behavior?"
+      placeholder: "The app returns a 500 server error."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: ✅ Expected Behavior
+      description: "What should happen instead?"
+      placeholder: "It should show a validation error message."
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📄 Logs / Screenshots
+      description: "Add error logs, screenshots, or videos if possible."
+      placeholder: "Paste logs or screenshots here."
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: 🌐 Environment
+      description: "OS, browser, app version, DB version, etc."
+      placeholder: "Windows 11, Chrome 125, Laravel v10.30"
+    validations:
+      required: false

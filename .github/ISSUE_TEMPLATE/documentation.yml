@@ -1,0 +1,51 @@
+name: Documentation Issue
+description: Report missing, outdated, or unclear documentation.
+title: "[DOCS]: "
+labels: ["documentation", "triage"]
+assignees: []
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: 📌 Summary
+      description: "Brief summary of the documentation issue. This appears in the issue list preview."
+      placeholder: "Missing example for API authentication."
+    validations:
+      required: true
+
+  - type: input
+    id: page_or_section
+    attributes:
+      label: 📄 Affected Page or Section
+      description: "Which documentation page, URL, or section does this relate to?"
+      placeholder: "/docs/authentication"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: ❌ Issue Description
+      description: "Describe what is missing, outdated, or unclear."
+      placeholder: "The documentation doesn't show how to generate an API token."
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested_change
+    attributes:
+      label: ✅ Suggested Fix or Update
+      description: "Propose how the documentation could be improved."
+      placeholder: "Add an example curl command showing how to get an API token."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 💬 Additional Context
+      description: "Any other notes, screenshots, or references?"
+      placeholder: ""
+    validations:
+      required: false

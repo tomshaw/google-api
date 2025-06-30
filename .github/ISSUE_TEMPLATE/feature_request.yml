@@ -1,0 +1,51 @@
+name: Feature Request
+description: Suggest a new feature or capability.
+title: "[FEATURE]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: 📌 Summary
+      description: "Short summary of the feature request. This shows in the issue list preview."
+      placeholder: "Add a dark mode toggle in the header."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: ❓ Problem / Use Case
+      description: "What problem does this feature solve?"
+      placeholder: "Users find the bright theme difficult to use at night."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: 💡 Proposed Solution
+      description: "Describe how you’d like it implemented."
+      placeholder: "Add a toggle button in the navbar to switch between dark and light themes."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternatives Considered
+      description: "Have you considered other solutions or workarounds?"
+      placeholder: "Users can use browser plugins, but it's not ideal."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 💬 Additional Context
+      description: "Any other details, screenshots, or references?"
+      placeholder: "Figma designs, competitor apps, etc."
+    validations:
+      required: false

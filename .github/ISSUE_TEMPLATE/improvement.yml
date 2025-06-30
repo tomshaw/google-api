@@ -1,0 +1,51 @@
+name: Improvement
+description: Propose an improvement to existing functionality.
+title: "[IMPROVEMENT]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: 📌 Summary
+      description: "Short description of the improvement. This appears in the issue list preview."
+      placeholder: "Optimize the dashboard load time."
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: ❌ Current Behavior
+      description: "What is the current limitation or issue?"
+      placeholder: "Dashboard takes ~5 seconds to load data."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_change
+    attributes:
+      label: ✅ Proposed Change
+      description: "Describe the improvement you would like to see."
+      placeholder: "Implement data caching to reduce load time."
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: 🚀 Benefits
+      description: "How would this change help users or maintainers?"
+      placeholder: "Improved user experience and reduced server load."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 💬 Additional Context
+      description: "Any other notes, screenshots, or examples?"
+      placeholder: ""
+    validations:
+      required: false
