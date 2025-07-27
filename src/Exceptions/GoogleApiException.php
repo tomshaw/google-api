@@ -4,6 +4,4 @@ namespace TomShaw\GoogleApi\Exceptions;
 
 use RuntimeException;
 
-final class GoogleApiException extends RuntimeException
-{
-}
+final class GoogleApiException extends RuntimeException {}

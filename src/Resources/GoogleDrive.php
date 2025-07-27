@@ -28,7 +28,7 @@ final class GoogleDrive
 
     public function createFile(string $name, string $mimeType, string $content): DriveFile
     {
-        $file = new DriveFile();
+        $file = new DriveFile;
         $file->setName($name);
         $file->setMimeType($mimeType);
 

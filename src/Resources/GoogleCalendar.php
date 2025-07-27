@@ -75,7 +75,7 @@ final class GoogleCalendar
      */
     public function addEvent(string $summary, ?string $location, ?string $description, Carbon $from, Carbon $to): Event
     {
-        $event = new Event();
+        $event = new Event;
         $event->setSummary($summary);
 
         if ($location) {
@@ -86,11 +86,11 @@ final class GoogleCalendar
             $event->setDescription($description);
         }
 
-        $start = new EventDateTime();
+        $start = new EventDateTime;
         $start->setDateTime($from->toRfc3339String());
         $event->setStart($start);
 
-        $end = new EventDateTime();
+        $end = new EventDateTime;
         $end->setDateTime($to->toRfc3339String());
         $event->setEnd($end);
 
@@ -121,11 +121,11 @@ final class GoogleCalendar
             $event->setDescription($description);
         }
 
-        $start = new EventDateTime();
+        $start = new EventDateTime;
         $start->setDateTime($from->toRfc3339String());
         $event->setStart($start);
 
-        $end = new EventDateTime();
+        $end = new EventDateTime;
         $end->setDateTime($to->toRfc3339String());
         $event->setEnd($end);
 

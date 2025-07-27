@@ -366,7 +366,7 @@ final class GoogleMail
 
         $message = $this->buildMessage($validated);
 
-        $msg = new Message();
+        $msg = new Message;
         $msg->setRaw($this->encodeUrlSafeMessage($message));
 
         return $this->service->users_messages->send('me', $msg);
