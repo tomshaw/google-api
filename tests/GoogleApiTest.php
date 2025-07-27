@@ -25,7 +25,7 @@ beforeEach(function () {
 
     Config::set('google-api', require realpath(__DIR__.DIRECTORY_SEPARATOR.'Mock'.DIRECTORY_SEPARATOR.'config.php'));
 
-    $this->client = new GoogleClient(new Client());
+    $this->client = new GoogleClient(new Client);
 });
 
 afterEach(function () {
