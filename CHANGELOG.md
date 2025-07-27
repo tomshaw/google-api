@@ -2,6 +2,23 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.8.0](https://github.com/tomshaw/google-api/compare/v0.7.3...v0.8.0) (2025-07-27)
+
+
+### Features
+
+* **issue-templates:** add comprehensive issue templates for bug reports, feature requests, documentation issues, improvements, and questions ([36f9d90](https://github.com/tomshaw/google-api/commit/36f9d90b45b9f5ecce8c29737286a5b897befb97))
+
+
+### Bug Fixes
+
+* **.gitignore:** add .DS_Store to ignore list ([f61462c](https://github.com/tomshaw/google-api/commit/f61462c846408aa093a48f2581350e3efc2254b2))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump stefanzweifel/git-auto-commit-action from 5 to 6 ([b6e9eb1](https://github.com/tomshaw/google-api/commit/b6e9eb1c2f8cd63d7369d440e052f18914c0f44a))
+
 ## [0.7.3](https://github.com/tomshaw/google-api/compare/v0.7.2...v0.7.3) (2025-02-03)
 
 
