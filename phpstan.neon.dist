@@ -7,5 +7,3 @@ parameters:
     paths:
         - src
     tmpDir: build/phpstan
-    checkGenericClassInNonGenericObjectType: false
-    checkMissingIterableValueType: false
