@@ -18,8 +18,8 @@ body:
     id: question_details
     attributes:
       label: ❓ Details
-      description: "Describe your question, what you’re trying to do, and where you’re stuck."
-      placeholder: "I’m trying to connect to the API with a custom domain, but getting a 403 error."
+      description: "Describe your question, what you're trying to do, and where you're stuck."
+      placeholder: "I'm trying to connect to the API with a custom domain, but getting a 403 error."
     validations:
       required: true
 
@@ -27,7 +27,7 @@ body:
     id: tried
     attributes:
       label: 🛠️ What have you tried?
-      description: "List any docs, code, or troubleshooting you’ve done so far."
+      description: "List any docs, code, or troubleshooting you've done so far."
       placeholder: "Checked the README, tried setting the API_BASE_URL variable, etc."
     validations:
       required: false
@@ -37,6 +37,6 @@ body:
     attributes:
       label: 💬 Additional Context
       description: "Any other information, screenshots, or logs?"
-      placeholder: ""
+      placeholder: "Add additional context"
     validations:
       required: false

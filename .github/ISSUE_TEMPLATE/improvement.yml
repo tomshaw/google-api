@@ -46,6 +46,6 @@ body:
     attributes:
       label: 💬 Additional Context
       description: "Any other notes, screenshots, or examples?"
-      placeholder: ""
+      placeholder: "Add additional context"
     validations:
       required: false

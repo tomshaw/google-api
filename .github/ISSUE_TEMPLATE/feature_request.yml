@@ -27,7 +27,7 @@ body:
     id: proposed_solution
     attributes:
       label: 💡 Proposed Solution
-      description: "Describe how you’d like it implemented."
+      description: "Describe how you would like it implemented."
       placeholder: "Add a toggle button in the navbar to switch between dark and light themes."
     validations:
       required: true

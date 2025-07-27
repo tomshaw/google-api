@@ -28,7 +28,7 @@ body:
     attributes:
       label: ❌ Issue Description
       description: "Describe what is missing, outdated, or unclear."
-      placeholder: "The documentation doesn't show how to generate an API token."
+      placeholder: "The documentation does not show how to generate an API token."
     validations:
       required: true
 
@@ -46,6 +46,6 @@ body:
     attributes:
       label: 💬 Additional Context
       description: "Any other notes, screenshots, or references?"
-      placeholder: ""
+      placeholder: "Add additional context"
     validations:
       required: false

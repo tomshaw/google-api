@@ -1,0 +1,69 @@
+name: General Issue
+description: File a bug, feature request, or improvement. Please include a meaningful summary.
+title: "[ISSUE]: "
+labels: ["triage"]
+assignees: []
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: 📌 Summary
+      description: "Briefly describe the issue in 1-2 sentences. This will appear in the issue list preview."
+      placeholder: "Login form crashes when submitting invalid credentials"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: 🧩 Type of Issue
+      description: "What kind of issue is this?"
+      options:
+        - Bug
+        - Feature Request
+        - Improvement
+        - Question / Help
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: module
+    attributes:
+      label: 🗂️ Related Service / Module
+      description: "Which part of the system is this about? (e.g., MaterialService, Proposals)"
+      placeholder: "AuthService"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Detailed Description
+      description: "Provide a clear explanation of the issue or request. Include what is currently happening and what should happen instead."
+      placeholder: "When submitting invalid credentials, the app crashes with a 500 error. It should return a validation error."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 🔁 Steps to Reproduce (if applicable)
+      description: "Only for bugs — include clear steps, screenshots, or logs."
+      placeholder: |
+        1. Go to /login
+        2. Enter invalid credentials
+        3. Click Submit
+        4. See error
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 💡 Additional Context
+      description: "Add any other info: environment, OS, browser, logs, etc."
+      placeholder: "Windows 11, Chrome 125, Laravel v10.30"
+    validations:
+      required: false
