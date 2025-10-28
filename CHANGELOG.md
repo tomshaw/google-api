@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.10.0](https://github.com/tomshaw/google-api/compare/v0.9.0...v0.10.0) (2025-10-28)
+
+
+### Features
+
+* update README to include additional Google API service adapters and usage examples ([fddda10](https://github.com/tomshaw/google-api/commit/fddda1088c9e9a662bd2ecd2cf22eea7d6bc8d25))
+
 ## [0.9.0](https://github.com/tomshaw/google-api/compare/v0.8.0...v0.9.0) (2025-10-28)
 
 
