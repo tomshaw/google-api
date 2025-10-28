@@ -123,51 +123,59 @@ You can provide your own storage mechanism such as file or Redis by setting the 
 
 ## Services Adapters
 
-This package includes a Google `Calendar` and `Gmail` adapter classes. Feel free to send a pull request if you would like to add your own. 
+This package includes service adapters for Google Calendar, Gmail, Drive, and Books. Each adapter provides a fluent interface for interacting with the respective Google API.
 
-> Using the client to create a calendar event for the following day 1:00PM.
+### Available Services
 
-```php
-    public function add()
-    {
-        $calendar = GoogleApi::calendar()->setCalendarId('email@example.com');
+- **[Google Calendar](docs/calendar.md)** - Manage calendar events (create, read, update, delete)
+- **[Gmail](docs/gmail.md)** - Send emails with attachments, CC, BCC, and Laravel Mailable support
+- **[Google Drive](docs/drive.md)** - List, retrieve, and upload files to Google Drive
+- **[Google Books](docs/books.md)** - Search and retrieve book information from Google Books
 
-        $summary = 'Test Event';
-        $location = '123 Test St, Test City, TS';
-        $description = 'This is a test event.';
+### Quick Examples
 
-        $from = Carbon::now()->timezone('America/Chicago')->addDay()->startOfDay()->addHours(13);
-        $to = $from->copy()->addHour();
-
-        $event = $calendar->addEvent($summary, $location, $description, $from, $to);
-
-        // save event id for event updates.
-    }
-```
-
-> Using the client to send emails.
+#### Calendar - Create an Event
 
 ```php
-    public function mount(Order $id)
-    {
-        $model = Order::with(['user'])->where('id', $id)->first();
-        
-        $attachments = [
-            storage_path('app/public/discount.jpg'),
-            storage_path('app/public/invoice.pdf'),
-        ];
+use TomShaw\GoogleApi\Facades\GoogleApi;
+use Carbon\Carbon;
 
-        $gmail = GoogleApi::gmail();
-        $gmail->from('email@example.com', 'Company Name');
-        $gmail->to($model->user->email, $model->user->name);
-        $gmail->cc('sales@example.com');
-        $gmail->bcc('manager@example.com');
-        $gmail->subject('Thank you for your order.');
-        $gmail->mailable(new OrderMailable($model, 'template-name'));
-        $gmail->attachments($attachments);
-        $gmail->send();
-    }
+$calendar = GoogleApi::calendar()->setCalendarId('email@example.com');
+
+$summary = 'Test Event';
+$location = '123 Test St, Test City, TS';
+$description = 'This is a test event.';
+
+$from = Carbon::now()->timezone('America/Chicago')->addDay()->startOfDay()->addHours(13);
+$to = $from->copy()->addHour();
+
+$event = $calendar->addEvent($summary, $location, $description, $from, $to);
+
+// Save event ID for future updates
+$eventId = $event->getId();
 ```
+
+#### Gmail - Send an Email
+
+```php
+use TomShaw\GoogleApi\Facades\GoogleApi;
+
+$gmail = GoogleApi::gmail();
+
+$gmail->from('email@example.com', 'Company Name')
+    ->to('customer@example.com', 'Customer Name')
+    ->cc('sales@example.com')
+    ->bcc('manager@example.com')
+    ->subject('Thank you for your order.')
+    ->mailable(new OrderMailable($order))
+    ->attachments([
+        storage_path('app/public/discount.jpg'),
+        storage_path('app/public/invoice.pdf'),
+    ])
+    ->send();
+```
+
+For detailed documentation and more examples, see the links above.
 
 ## Changelog
 
