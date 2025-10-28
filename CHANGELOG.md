@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.9.0](https://github.com/tomshaw/google-api/compare/v0.8.0...v0.9.0) (2025-10-28)
+
+
+### Features
+
+* add getEvent method to retrieve specific events from Google Calendar ([a06fd62](https://github.com/tomshaw/google-api/commit/a06fd623200ebb92cced96c33604a0018a375774))
+
 ## [0.8.0](https://github.com/tomshaw/google-api/compare/v0.7.3...v0.8.0) (2025-07-27)
 
 
