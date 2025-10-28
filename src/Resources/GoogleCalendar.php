@@ -64,6 +64,17 @@ final class GoogleCalendar
     }
 
     /**
+     * Gets a specific event from the Google Calendar.
+     *
+     * @param  string  $eventId  The ID of the event to retrieve.
+     * @return Event The requested event.
+     */
+    public function getEvent(string $eventId): Event
+    {
+        return $this->service->events->get($this->calendarId, $eventId);
+    }
+
+    /**
      * Adds a new event to the Google Calendar.
      *
      * @param  string  $summary  The summary of the event.
