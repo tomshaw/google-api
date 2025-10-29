@@ -2,6 +2,15 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.10.2](https://github.com/tomshaw/google-api/compare/v0.10.0...v0.10.2) (2025-10-29)
+
+
+### Miscellaneous Chores
+
+* force release 0.10.2 ([f83147d](https://github.com/tomshaw/google-api/commit/f83147d873b2121b64aaa4b6458b86cca07bfd12))
+* release 0.10.1 ([2adad33](https://github.com/tomshaw/google-api/commit/2adad3336a9aa554fc1f2c3747fb3a7842476a79))
+* update .gitignore ([ab3c52b](https://github.com/tomshaw/google-api/commit/ab3c52b4d19f966a134bf96d4c94116cdbc221a5))
+
 ## [0.10.0](https://github.com/tomshaw/google-api/compare/v0.9.0...v0.10.0) (2025-10-28)
 
 
