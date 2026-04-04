@@ -2,6 +2,19 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.11.0](https://github.com/tomshaw/google-api/compare/v0.10.2...v0.11.0) (2026-04-04)
+
+
+### Features
+
+* update dependencies and configurations for PHP 8.5 and Laravel 13 ([10e3f70](https://github.com/tomshaw/google-api/commit/10e3f70b96bfdd9feadf4dde185d4cf5d89d2257))
+* update PHP version to 8.5 in PHPStan workflow ([f9e4290](https://github.com/tomshaw/google-api/commit/f9e429092e8e3339d8f8a09035f90dd5102ce1f0))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump actions/checkout from 5 to 6 ([9d25397](https://github.com/tomshaw/google-api/commit/9d25397a294787dd464be6c8370f7dc44656adf8))
+
 ## [0.10.2](https://github.com/tomshaw/google-api/compare/v0.10.0...v0.10.2) (2025-10-29)
 
 
