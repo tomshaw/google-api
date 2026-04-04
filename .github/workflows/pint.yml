@@ -21,3 +21,4 @@ jobs:
         uses: aglipanci/laravel-pint-action@2.6
         with:
           testMode: true
+          configPath: pint.json
