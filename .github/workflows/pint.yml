@@ -1,6 +1,7 @@
 name: Code Linting
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '**.php'
