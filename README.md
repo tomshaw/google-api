@@ -8,6 +8,11 @@
 
 A Google OAuth 2.0 Laravel Service Client.
 
+## Requirements
+
+- PHP ^8.2
+- Laravel ^10.14 | ^11.0 | ^12.0 | ^13.0
+
 ## Installation
 
 You can install the package via composer:
