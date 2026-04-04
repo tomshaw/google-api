@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
   pull_request:
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
