@@ -77,10 +77,6 @@ class GoogleClient
 
     public function setStorage(StorageAdapterInterface $storageAdapter): self
     {
-        if (! $storageAdapter instanceof StorageAdapterInterface) {
-            throw new GoogleClientException('Invalid token storage.');
-        }
-
         $this->storageAdapter = $storageAdapter;
 
         return $this;

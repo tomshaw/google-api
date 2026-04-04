@@ -1,12 +1,14 @@
 <?php
 
+use TomShaw\GoogleApi\Storage\DatabaseStorageAdapter;
+
 return [
     /**
      * Set the default token storage adapter to use.
      *
      * You can provide your own storage mechanism such as file or Redis by implementing the StorageAdapterInterface.
      */
-    'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseStorageAdapter::class,
+    'token_storage_adapter' => DatabaseStorageAdapter::class,
 
     /**
      * This structure should match the file downloaded from the "Download JSON" button on in the Google Developer Console.

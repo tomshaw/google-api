@@ -3,6 +3,7 @@
 use Google\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
+use PHPUnit\Framework\TestCase;
 use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Resources\GoogleCalendar;
@@ -11,7 +12,7 @@ use TomShaw\GoogleApi\Storage\SessionStorageAdapter;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 test('instance check', function () {
-    $this->assertTrue($this instanceof \PHPUnit\Framework\TestCase);
+    $this->assertTrue($this instanceof TestCase);
 });
 
 beforeEach(function () {
@@ -49,7 +50,7 @@ it('returns access token when token is set', function () {
 });
 
 it('sets and gets the storage adapter correctly', function () {
-    $mockStorageAdapter = \Mockery::mock(StorageAdapterInterface::class);
+    $mockStorageAdapter = Mockery::mock(StorageAdapterInterface::class);
 
     $this->client->setStorage($mockStorageAdapter);
 

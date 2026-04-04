@@ -2,6 +2,7 @@
 
 use Google\Service\Calendar;
 use Google\Service\Gmail;
+use TomShaw\GoogleApi\Storage\SessionStorageAdapter;
 
 return [
     /**
@@ -9,7 +10,7 @@ return [
      *
      * You can provide your own storage mechanism such as file or Redis by implementing the StorageAdapterInterface.
      */
-    'token_storage_adapter' => TomShaw\GoogleApi\Storage\SessionStorageAdapter::class,
+    'token_storage_adapter' => SessionStorageAdapter::class,
 
     /**
      * This structure should match the file downloaded from the "Download JSON" button on in the Google Developer Console.

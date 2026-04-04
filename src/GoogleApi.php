@@ -5,7 +5,7 @@ namespace TomShaw\GoogleApi;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @mixin \TomShaw\GoogleApi\GoogleApiManager
+ * @mixin GoogleApiManager
  */
 class GoogleApi extends Facade
 {
