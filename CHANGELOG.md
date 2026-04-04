@@ -2,6 +2,16 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.12.0](https://github.com/tomshaw/google-api/compare/v0.11.1...v0.12.0) (2026-04-04)
+
+
+### Features
+
+* apply pint code style fixes and update linting workflow ([7be7be2](https://github.com/tomshaw/google-api/commit/7be7be2c3a1e10f529cc176656e043eab08d57da))
+* fix pint workflow to use project config and revert incorrect style changes ([f783ba0](https://github.com/tomshaw/google-api/commit/f783ba041670022e09a3909d6a4a1c082b58b6fa))
+* standardize CI workflows and update dependencies for Laravel 13 ([80e448f](https://github.com/tomshaw/google-api/commit/80e448f6364a27e1fb46a181b76a1775ef36f45c))
+* use project pint version in CI instead of external action ([f7ee30d](https://github.com/tomshaw/google-api/commit/f7ee30d5b6c7838bb1ac95deec8f663b7d1a511c))
+
 ## [0.11.1](https://github.com/tomshaw/google-api/compare/v0.11.0...v0.11.1) (2026-04-04)
 
 
