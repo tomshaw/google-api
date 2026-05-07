@@ -2,6 +2,19 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.13.0](https://github.com/tomshaw/google-api/compare/v0.12.0...v0.13.0) (2026-05-07)
+
+
+### Features
+
+* 🚀 upgrade to Laravel 13 ([8160367](https://github.com/tomshaw/google-api/commit/8160367174fc2cd54b373bf20fb728d1c564c2f3))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump googleapis/release-please-action from 4 to 5 ([ba6187f](https://github.com/tomshaw/google-api/commit/ba6187f15bd1300d991c2d9e0fef5806ab6bd495))
+* **deps:** bump googleapis/release-please-action from 4 to 5 ([8c3dd78](https://github.com/tomshaw/google-api/commit/8c3dd78647da018ee000e6b4831c4dad48d01abf))
+
 ## [0.12.0](https://github.com/tomshaw/google-api/compare/v0.11.1...v0.12.0) (2026-04-04)
 
 
