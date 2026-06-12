@@ -2,6 +2,19 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.14.0](https://github.com/tomshaw/google-api/compare/v0.13.0...v0.14.0) (2026-06-12)
+
+
+### Features
+
+* add strict types declaration across multiple files ([48536be](https://github.com/tomshaw/google-api/commit/48536bedade165a548629847906279800891796e))
+* enhance Gmail attachment handling with streamed uploads and MIME message improvements ([7bde803](https://github.com/tomshaw/google-api/commit/7bde803fb0c3dc35a973fb771e1d2a9c9d4dd643))
+* enhance type declarations and nullability in GoogleMail and GoogleApiServiceProvider ([26df8a9](https://github.com/tomshaw/google-api/commit/26df8a96a84449496c3accf598bab9b50428f41d))
+* enhance type safety and error handling across multiple classes, improve message building in GoogleMail, and update PHPStan configuration ([8a856b9](https://github.com/tomshaw/google-api/commit/8a856b98e77a58ee6d317062d7b7d6732a4b7a60))
+* implement user-scoped storage and enhance access token management with enums ([bbfed82](https://github.com/tomshaw/google-api/commit/bbfed820079caa1fcd39e28e19e6f402c3f5bf8a))
+* update composer dependencies, enhance PHPStan level, and improve GoogleMail attachment handling ([3375847](https://github.com/tomshaw/google-api/commit/33758470eb6eba5deb025e74b8581e66c0b815be))
+* update type declarations and improve nullability across multiple files ([2f8e84d](https://github.com/tomshaw/google-api/commit/2f8e84da38ff28ff01b044fdbdf334debc2e42e7))
+
 ## [0.13.0](https://github.com/tomshaw/google-api/compare/v0.12.0...v0.13.0) (2026-05-07)
 
 
