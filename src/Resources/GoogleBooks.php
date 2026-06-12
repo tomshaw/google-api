@@ -18,11 +18,17 @@ final class GoogleBooks
         $this->service = new Books($client());
     }
 
+    /**
+     * @param  array<string, mixed>  $optParams
+     */
     public function get(string $volumeId, array $optParams = []): Volume
     {
         return $this->service->volumes->get($volumeId, $optParams);
     }
 
+    /**
+     * @param  array<string, mixed>  $optParams
+     */
     public function listVolumes(string $query, array $optParams = []): Volumes
     {
         return $this->service->volumes->listVolumes($query, $optParams);

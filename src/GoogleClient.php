@@ -15,14 +15,13 @@ class GoogleClient
 {
     protected StorageAdapterInterface $storageAdapter;
 
-    /** @var array<string, string> */
-    public static array $rules = [
+    private const array RULES = [
         'access_token' => 'required|string',
         'refresh_token' => 'required|string',
-        'expires_in' => 'required|numeric',
+        'expires_in' => 'required|integer',
         'scope' => 'required|string',
         'token_type' => 'required|string',
-        'created' => 'required|numeric',
+        'created' => 'required|integer',
     ];
 
     public function __construct(
@@ -93,6 +92,9 @@ class GoogleClient
         return new StorageCollection($this->getStorage()->get());
     }
 
+    /**
+     * @param  array<string, mixed>  $accessToken
+     */
     public function setAccessToken(array $accessToken): self
     {
         $this->storageAdapter->set($accessToken);
@@ -122,6 +124,9 @@ class GoogleClient
         exit;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function fetchAccessTokenWithRefreshToken(?string $refreshToken): array
     {
         $response = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
@@ -135,6 +140,9 @@ class GoogleClient
         return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function fetchAccessTokenWithAuthCode(string $authCode): array
     {
         $response = $this->client->fetchAccessTokenWithAuthCode($authCode);
@@ -148,9 +156,12 @@ class GoogleClient
         return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function validate(string $accessToken, string $refreshToken, int $expiresIn, string $scope, string $tokenType, int $created): array
     {
-        $validator = Validator::make(['access_token' => $accessToken, 'refresh_token' => $refreshToken, 'expires_in' => $expiresIn, 'scope' => $scope, 'token_type' => $tokenType, 'created' => $created], self::$rules);
+        $validator = Validator::make(['access_token' => $accessToken, 'refresh_token' => $refreshToken, 'expires_in' => $expiresIn, 'scope' => $scope, 'token_type' => $tokenType, 'created' => $created], self::RULES);
 
         if ($validator->fails()) {
             throw new GoogleClientException($validator->messages()->first());

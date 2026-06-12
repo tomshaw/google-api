@@ -6,6 +6,9 @@ namespace TomShaw\GoogleApi\Models;
 
 use Illuminate\Support\Collection;
 
+/**
+ * @extends Collection<array-key, mixed>
+ */
 class StorageCollection extends Collection
 {
     public int $id;

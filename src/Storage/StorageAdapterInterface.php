@@ -6,6 +6,9 @@ namespace TomShaw\GoogleApi\Storage;
 
 interface StorageAdapterInterface
 {
+    /**
+     * @param  array<string, mixed>  $accessToken
+     */
     public function set(array $accessToken): self;
 
     public function get(): mixed;

@@ -15,7 +15,7 @@ final class GoogleCalendar
 {
     protected Calendar $service;
 
-    protected string $calendarId;
+    protected string $calendarId = 'primary';
 
     public function __construct(protected GoogleClient $client)
     {
@@ -149,7 +149,7 @@ final class GoogleCalendar
      * Deletes an event from the Google Calendar.
      *
      * @param  string  $eventId  The ID of the event to delete.
-     * @param  array  $optParams  Optional parameters for the delete request.
+     * @param  array<string, mixed>  $optParams  Optional parameters for the delete request.
      * @return mixed The response from the Google Calendar API.
      */
     public function deleteEvent(string $eventId, array $optParams = []): mixed

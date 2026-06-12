@@ -8,6 +8,9 @@ use TomShaw\GoogleApi\Models\GoogleToken;
 
 class DatabaseStorageAdapter implements StorageAdapterInterface
 {
+    /**
+     * @param  array<string, mixed>  $accessToken
+     */
     public function set(array $accessToken): self
     {
         GoogleToken::updateOrCreate(['user_id' => auth()->id()], array_merge(['user_id' => auth()->id()], $accessToken));

@@ -19,8 +19,10 @@ final class GoogleMail
 
     protected ?string $toEmail = null;
 
+    /** @var array<int, string> */
     protected array $cc = [];
 
+    /** @var array<int, string> */
     protected array $bCC = [];
 
     protected ?string $fromName = null;
@@ -31,6 +33,7 @@ final class GoogleMail
 
     protected ?string $message = null;
 
+    /** @var array<int, string> */
     protected array $attachments = [];
 
     public function __construct(protected GoogleClient $client)
@@ -87,7 +90,7 @@ final class GoogleMail
     /**
      * Sets the carbon copy emails.
      *
-     * @param  array  $cc  The emails to set.
+     * @param  array<int, string>  $cc  The emails to set.
      * @return GoogleMail The current instance.
      */
     public function setCC(array $cc = []): GoogleMail
@@ -100,7 +103,7 @@ final class GoogleMail
     /**
      * Gets the carbon copy emails.
      *
-     * @return array The carbon copy emails.
+     * @return array<int, string> The carbon copy emails.
      */
     public function getCC(): array
     {
@@ -110,7 +113,7 @@ final class GoogleMail
     /**
      * Sets the blind carbon copy emails.
      *
-     * @param  array  $bCC  The emails to set.
+     * @param  array<int, string>  $bCC  The emails to set.
      * @return GoogleMail The current instance.
      */
     public function setBCC(array $bCC = []): GoogleMail
@@ -123,7 +126,7 @@ final class GoogleMail
     /**
      * Gets the blind carbon copy emails.
      *
-     * @return array The blind carbon copy emails.
+     * @return array<int, string> The blind carbon copy emails.
      */
     public function getBCC(): array
     {
@@ -255,7 +258,7 @@ final class GoogleMail
     /**
      * Sets the carbon copy emails.
      *
-     * @param  string|array  $email  The email to set.
+     * @param  string|array<int, string>  $email  The email to set.
      * @return GoogleMail The current instance.
      */
     public function cc(string|array $email): GoogleMail
@@ -272,7 +275,7 @@ final class GoogleMail
     /**
      * Sets the blind carbon copy emails.
      *
-     * @param  string|array  $email  The email to set.
+     * @param  string|array<int, string>  $email  The email to set.
      * @return GoogleMail The current instance.
      */
     public function bcc(string|array $email): GoogleMail
@@ -343,7 +346,7 @@ final class GoogleMail
     /**
      * Add an array of email attachments.
      *
-     * @param  array  $paths  The path to the attachment.
+     * @param  array<int, string>  $paths  The path to the attachment.
      * @return GoogleMail The current instance.
      */
     public function attachments(array $paths): self
@@ -377,12 +380,12 @@ final class GoogleMail
     /**
      * Builds the email message.
      *
-     * @param  array  $validated  The validated data.
+     * @param  array<string, mixed>  $validated  The validated data.
      * @return string The email message.
      */
     protected function buildMessage(array $validated): string
     {
-        $boundary = md5((string) time());
+        $boundary = bin2hex(random_bytes(16));
 
         $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
         $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
@@ -399,12 +402,12 @@ final class GoogleMail
             $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n";
 
             foreach ($this->attachments as $attachment) {
-                $attachmentData = base64_encode(file_get_contents($attachment));
+                $attachmentData = chunk_split(base64_encode(file_get_contents($attachment)), 76, "\r\n");
 
                 $headers .= "--$boundary\r\n";
                 $headers .= 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n";
                 $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
-                $headers .= $attachmentData."\r\n\r\n";
+                $headers .= $attachmentData."\r\n";
             }
 
             $headers .= "--$boundary\r\n";
@@ -426,7 +429,7 @@ final class GoogleMail
      *
      * The maximum total size is set to 25MB, which is the limit for attachments sent through Gmail.
      *
-     * @param  array  $attachments  The attachments to validate.
+     * @param  array<int, string>  $attachments  The attachments to validate.
      *
      * @throws \Exception If the attachments are invalid.
      */
@@ -463,6 +466,7 @@ final class GoogleMail
     /**
      * Converts the carbon copy emails to a string.
      *
+     * @param  array<int, string>  $emails  The emails to convert.
      * @return string The carbon copy emails as a string.
      */
     public function arrayToString(array $emails): string
@@ -479,7 +483,7 @@ final class GoogleMail
     /**
      * Validates the email message.
      *
-     * @return array The validated data.
+     * @return array<string, mixed> The validated data.
      */
     protected function validateMessage(): array
     {

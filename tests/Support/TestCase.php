@@ -11,6 +11,7 @@ use TomShaw\GoogleApi\Providers\GoogleApiServiceProvider;
 
 class TestCase extends Orchestra
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,6 +23,7 @@ class TestCase extends Orchestra
      * @param  Application  $app
      * @return array<int, class-string>
      */
+    #[\Override]
     protected function getPackageProviders($app): array
     {
         return [

@@ -18,11 +18,17 @@ final class GoogleDrive
         $this->service = new Drive($client());
     }
 
+    /**
+     * @param  array<string, mixed>  $optParams
+     */
     public function listFiles(array $optParams = []): FileList
     {
         return $this->service->files->listFiles($optParams);
     }
 
+    /**
+     * @param  array<string, mixed>  $optParams
+     */
     public function getFile(string $fileId, array $optParams = []): DriveFile
     {
         return $this->service->files->get($fileId, $optParams);

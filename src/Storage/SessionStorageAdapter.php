@@ -8,6 +8,9 @@ class SessionStorageAdapter implements StorageAdapterInterface
 {
     public const SESSION_KEY = 'google_api_token';
 
+    /**
+     * @param  array<string, mixed>  $accessToken
+     */
     public function set(array $accessToken): self
     {
         session([self::SESSION_KEY => $accessToken]);
@@ -15,6 +18,9 @@ class SessionStorageAdapter implements StorageAdapterInterface
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function get(): ?array
     {
         return session()->get(self::SESSION_KEY);
