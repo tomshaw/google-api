@@ -35,17 +35,19 @@ class GoogleClient
      */
     public static function make(?StorageAdapterInterface $storageAdapter = null): self
     {
-        if (! file_exists(config('google-api.auth_config'))) {
+        $authConfig = self::configString('google-api.auth_config');
+
+        if (! file_exists($authConfig)) {
             throw new GoogleClientException('Unable to load client secrets.');
         }
 
         $client = new Client;
 
-        $client->setAuthConfig(config('google-api.auth_config'));
+        $client->setAuthConfig($authConfig);
 
-        $client->addScope(config('google-api.service_scopes'));
+        $client->addScope(self::configScopes('google-api.service_scopes'));
 
-        $client->setApplicationName(config('google-api.application_name'));
+        $client->setApplicationName(self::configString('google-api.application_name'));
 
         $client->setPrompt(self::configString('google-api.prompt'));
 
@@ -53,7 +55,7 @@ class GoogleClient
 
         $client->setAccessType(self::configString('google-api.access_type'));
 
-        $client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
+        $client->setIncludeGrantedScopes((bool) config('google-api.include_grant_scopes'));
 
         return new self($client, $storageAdapter ?? app(StorageAdapterInterface::class));
     }
@@ -185,22 +187,24 @@ class GoogleClient
     }
 
     /**
-     * @param  array<string, mixed>  $token
+     * @param  array<array-key, mixed>  $token
      * @return array<string, mixed>
      */
     public function validate(array $token): array
     {
+        $token = self::stringKeyed($token);
+
         $validator = Validator::make($token, self::RULES);
 
         if ($validator->fails()) {
             throw new GoogleClientException($validator->messages()->first());
         }
 
-        return $validator->validated();
+        return array_intersect_key($token, self::RULES);
     }
 
     /**
-     * @param  array<string, mixed>  $response
+     * @param  array<array-key, mixed>  $response
      * @return array<string, mixed>
      */
     protected function resolveAccessTokenResponse(array $response): array
@@ -214,10 +218,57 @@ class GoogleClient
         return $this->validate($response);
     }
 
+    /**
+     * @param  array<array-key, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private static function stringKeyed(array $values): array
+    {
+        $result = [];
+
+        foreach ($values as $key => $value) {
+            $result[(string) $key] = $value;
+        }
+
+        return $result;
+    }
+
     private static function configString(string $key): string
     {
         $value = config($key);
 
-        return $value instanceof BackedEnum ? (string) $value->value : $value;
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_string($value)) {
+            throw new GoogleClientException(sprintf('The [%s] config value must be a string.', $key));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function configScopes(string $key): array
+    {
+        $value = config($key);
+
+        if (! is_array($value)) {
+            throw new GoogleClientException(sprintf('The [%s] config value must be an array of scopes.', $key));
+        }
+
+        $scopes = [];
+
+        foreach ($value as $scope) {
+            if (! is_string($scope)) {
+                throw new GoogleClientException(sprintf('The [%s] config value must contain only string scopes.', $key));
+            }
+
+            $scopes[] = $scope;
+        }
+
+        return $scopes;
     }
 }

@@ -41,7 +41,9 @@ class DatabaseStorageAdapter implements UserScopedStorageAdapter
     protected function userId(): int|string|null
     {
         if ($this->user instanceof Authenticatable) {
-            return $this->user->getAuthIdentifier();
+            $identifier = $this->user->getAuthIdentifier();
+
+            return is_int($identifier) || is_string($identifier) ? $identifier : null;
         }
 
         return $this->user ?? auth()->id();

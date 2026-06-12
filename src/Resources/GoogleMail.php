@@ -6,6 +6,7 @@ namespace TomShaw\GoogleApi\Resources;
 
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
+use Google\Service\Gmail\Resource\UsersMessages;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Exceptions\GoogleApiException;
@@ -152,34 +153,36 @@ final class GoogleMail
             $this->validateAttachments($this->attachments);
         }
 
-        $validated = $this->validateMessage();
+        $this->validateMessage();
 
-        $message = $this->buildMessage($validated);
+        $message = $this->buildMessage();
 
         $msg = new Message;
         $msg->setRaw($this->encodeUrlSafeMessage($message));
 
-        return $this->service->users_messages->send('me', $msg);
+        return $this->userMessages()->send('me', $msg);
     }
 
     /**
      * Builds the email message.
-     *
-     * @param  array<string, mixed>  $validated
      */
-    protected function buildMessage(array $validated): string
+    protected function buildMessage(): string
     {
+        if ($this->fromEmail === null || $this->fromName === null || $this->toEmail === null || $this->toName === null || $this->subject === null || $this->message === null) {
+            throw new GoogleApiException('Cannot build an email message before it passes validation.');
+        }
+
         $boundary = bin2hex(random_bytes(16));
 
-        $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
-        $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
+        $headers = "From: {$this->fromName} <{$this->fromEmail}>\r\n";
+        $headers .= "To: {$this->toName} <{$this->toEmail}>\r\n";
         if (count($this->cc)) {
-            $headers .= "CC: {$this->arrayToString($validated['cc'])}\r\n";
+            $headers .= "CC: {$this->arrayToString($this->cc)}\r\n";
         }
         if (count($this->bcc)) {
-            $headers .= "BCC: {$this->arrayToString($validated['bcc'])}\r\n";
+            $headers .= "BCC: {$this->arrayToString($this->bcc)}\r\n";
         }
-        $headers .= "Subject: {$validated['subject']}\r\n";
+        $headers .= "Subject: {$this->subject}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
 
         if (! empty($this->attachments)) {
@@ -262,10 +265,8 @@ final class GoogleMail
 
     /**
      * Validates the email message.
-     *
-     * @return array<string, mixed>
      */
-    protected function validateMessage(): array
+    protected function validateMessage(): void
     {
         $validator = Validator::make([
             'fromEmail' => $this->fromEmail,
@@ -292,7 +293,16 @@ final class GoogleMail
         if ($validator->fails()) {
             throw new GoogleApiException($validator->errors()->first());
         }
+    }
 
-        return $validator->validated();
+    protected function userMessages(): UsersMessages
+    {
+        $userMessages = $this->service->users_messages;
+
+        if (! $userMessages instanceof UsersMessages) {
+            throw new GoogleApiException('The Gmail user messages resource is unavailable.');
+        }
+
+        return $userMessages;
     }
 }

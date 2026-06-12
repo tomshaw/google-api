@@ -7,6 +7,8 @@ namespace TomShaw\GoogleApi\Resources;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Google\Service\Drive\FileList;
+use Google\Service\Drive\Resource\Files as FilesResource;
+use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleDrive
@@ -23,7 +25,7 @@ final class GoogleDrive
      */
     public function listFiles(array $optParams = []): FileList
     {
-        return $this->service->files->listFiles($optParams);
+        return $this->files()->listFiles($optParams);
     }
 
     /**
@@ -31,7 +33,7 @@ final class GoogleDrive
      */
     public function getFile(string $fileId, array $optParams = []): DriveFile
     {
-        return $this->service->files->get($fileId, $optParams);
+        return $this->files()->get($fileId, $optParams);
     }
 
     public function createFile(string $name, string $mimeType, string $content): DriveFile
@@ -40,10 +42,21 @@ final class GoogleDrive
         $file->setName($name);
         $file->setMimeType($mimeType);
 
-        return $this->service->files->create($file, [
+        return $this->files()->create($file, [
             'data' => $content,
             'mimeType' => $mimeType,
             'uploadType' => 'multipart',
         ]);
+    }
+
+    protected function files(): FilesResource
+    {
+        $files = $this->service->files;
+
+        if (! $files instanceof FilesResource) {
+            throw new GoogleApiException('The Drive files resource is unavailable.');
+        }
+
+        return $files;
     }
 }

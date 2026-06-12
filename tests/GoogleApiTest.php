@@ -222,8 +222,8 @@ it('builds an rfc compliant mime message with attachments', function () {
         ->message('<p>Hi</p>')
         ->attachment($path);
 
-    $validated = (new ReflectionMethod($mail, 'validateMessage'))->invoke($mail);
-    $built = (new ReflectionMethod($mail, 'buildMessage'))->invoke($mail, $validated);
+    (new ReflectionMethod($mail, 'validateMessage'))->invoke($mail);
+    $built = (new ReflectionMethod($mail, 'buildMessage'))->invoke($mail);
 
     expect($built)->toContain('From: From Name <from@example.com>')
         ->toContain('To: To Name <to@example.com>')

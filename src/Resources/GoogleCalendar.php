@@ -9,6 +9,8 @@ use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
 use Google\Service\Calendar\EventDateTime;
 use Google\Service\Calendar\Events;
+use Google\Service\Calendar\Resource\Events as EventsResource;
+use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleCalendar
@@ -62,7 +64,7 @@ final class GoogleCalendar
             'timeMin' => date('c'),
         ];
 
-        return $this->service->events->listEvents($this->calendarId, $options);
+        return $this->events()->listEvents($this->calendarId, $options);
     }
 
     /**
@@ -73,7 +75,7 @@ final class GoogleCalendar
      */
     public function getEvent(string $eventId): Event
     {
-        return $this->service->events->get($this->calendarId, $eventId);
+        return $this->events()->get($this->calendarId, $eventId);
     }
 
     /**
@@ -107,7 +109,7 @@ final class GoogleCalendar
         $end->setDateTime($to->toRfc3339String());
         $event->setEnd($end);
 
-        return $this->service->events->insert($this->calendarId, $event);
+        return $this->events()->insert($this->calendarId, $event);
     }
 
     /**
@@ -123,7 +125,7 @@ final class GoogleCalendar
      */
     public function updateEvent(string $eventId, string $summary, Carbon $from, Carbon $to, ?string $location = null, ?string $description = null): Event
     {
-        $event = new Event($this->service->events->get($this->calendarId, $eventId));
+        $event = $this->events()->get($this->calendarId, $eventId);
         $event->setSummary($summary);
 
         if ($location) {
@@ -142,7 +144,7 @@ final class GoogleCalendar
         $end->setDateTime($to->toRfc3339String());
         $event->setEnd($end);
 
-        return $this->service->events->update($this->calendarId, $eventId, $event);
+        return $this->events()->update($this->calendarId, $eventId, $event);
     }
 
     /**
@@ -153,6 +155,17 @@ final class GoogleCalendar
      */
     public function deleteEvent(string $eventId, array $optParams = []): void
     {
-        $this->service->events->delete($this->calendarId, $eventId, $optParams);
+        $this->events()->delete($this->calendarId, $eventId, $optParams);
+    }
+
+    protected function events(): EventsResource
+    {
+        $events = $this->service->events;
+
+        if (! $events instanceof EventsResource) {
+            throw new GoogleApiException('The Calendar events resource is unavailable.');
+        }
+
+        return $events;
     }
 }

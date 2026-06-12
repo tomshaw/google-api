@@ -16,17 +16,17 @@ final readonly class AccessToken
     ) {}
 
     /**
-     * @param  array<string, mixed>  $token
+     * @param  array<array-key, mixed>  $token
      */
     public static function fromArray(array $token): self
     {
         return new self(
-            accessToken: isset($token['access_token']) ? (string) $token['access_token'] : null,
-            refreshToken: isset($token['refresh_token']) ? (string) $token['refresh_token'] : null,
-            expiresIn: isset($token['expires_in']) ? (int) $token['expires_in'] : null,
-            scope: isset($token['scope']) ? (string) $token['scope'] : null,
-            tokenType: isset($token['token_type']) ? (string) $token['token_type'] : null,
-            created: isset($token['created']) ? (int) $token['created'] : null,
+            accessToken: self::stringValue($token['access_token'] ?? null),
+            refreshToken: self::stringValue($token['refresh_token'] ?? null),
+            expiresIn: self::intValue($token['expires_in'] ?? null),
+            scope: self::stringValue($token['scope'] ?? null),
+            tokenType: self::stringValue($token['token_type'] ?? null),
+            created: self::intValue($token['created'] ?? null),
         );
     }
 
@@ -57,5 +57,23 @@ final readonly class AccessToken
         }
 
         return ($this->created + $this->expiresIn - $leewaySeconds) <= time();
+    }
+
+    private static function stringValue(mixed $value): ?string
+    {
+        return match (true) {
+            is_string($value) => $value,
+            is_int($value), is_float($value) => (string) $value,
+            default => null,
+        };
+    }
+
+    private static function intValue(mixed $value): ?int
+    {
+        return match (true) {
+            is_int($value) => $value,
+            is_numeric($value) => (int) $value,
+            default => null,
+        };
     }
 }

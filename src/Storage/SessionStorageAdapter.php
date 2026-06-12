@@ -19,11 +19,13 @@ class SessionStorageAdapter implements StorageAdapterInterface
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<array-key, mixed>|null
      */
     public function get(): ?array
     {
-        return session()->get(self::SESSION_KEY);
+        $token = session()->get(self::SESSION_KEY);
+
+        return is_array($token) ? $token : null;
     }
 
     public function delete(): void

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace TomShaw\GoogleApi\Resources;
 
 use Google\Service\Books;
+use Google\Service\Books\Resource\Volumes as VolumesResource;
 use Google\Service\Books\Volume;
 use Google\Service\Books\Volumes;
+use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleBooks
@@ -23,7 +25,7 @@ final class GoogleBooks
      */
     public function get(string $volumeId, array $optParams = []): Volume
     {
-        return $this->service->volumes->get($volumeId, $optParams);
+        return $this->volumes()->get($volumeId, $optParams);
     }
 
     /**
@@ -31,6 +33,17 @@ final class GoogleBooks
      */
     public function listVolumes(string $query, array $optParams = []): Volumes
     {
-        return $this->service->volumes->listVolumes($query, $optParams);
+        return $this->volumes()->listVolumes($query, $optParams);
+    }
+
+    protected function volumes(): VolumesResource
+    {
+        $volumes = $this->service->volumes;
+
+        if (! $volumes instanceof VolumesResource) {
+            throw new GoogleApiException('The Books volumes resource is unavailable.');
+        }
+
+        return $volumes;
     }
 }
