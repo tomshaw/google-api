@@ -6,6 +6,7 @@ namespace TomShaw\GoogleApi;
 
 use Google\Service;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Traits\Macroable;
 use TomShaw\GoogleApi\Resources\GoogleBooks;
 use TomShaw\GoogleApi\Resources\GoogleCalendar;
 use TomShaw\GoogleApi\Resources\GoogleDrive;
@@ -13,6 +14,8 @@ use TomShaw\GoogleApi\Resources\GoogleMail;
 
 class GoogleApiManager
 {
+    use Macroable;
+
     protected ?GoogleClient $client = null;
 
     /**

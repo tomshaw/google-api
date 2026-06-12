@@ -186,7 +186,13 @@ final class GoogleMail
             $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n";
 
             foreach ($this->attachments as $attachment) {
-                $attachmentData = chunk_split(base64_encode(file_get_contents($attachment)), 76, "\r\n");
+                $contents = file_get_contents($attachment);
+
+                if ($contents === false) {
+                    throw new GoogleApiException("File $attachment could not be read");
+                }
+
+                $attachmentData = chunk_split(base64_encode($contents), 76, "\r\n");
 
                 $headers .= "--$boundary\r\n";
                 $headers .= 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n";

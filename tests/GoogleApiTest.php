@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Google\Client;
 use Google\Service\Books;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
@@ -10,6 +11,7 @@ use TomShaw\GoogleApi\AccessToken;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
 use TomShaw\GoogleApi\Exceptions\TokenNotFoundException;
 use TomShaw\GoogleApi\GoogleApi;
+use TomShaw\GoogleApi\GoogleApiManager;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Resources\GoogleCalendar;
 use TomShaw\GoogleApi\Resources\GoogleMail;
@@ -146,6 +148,97 @@ it('builds mail fluently through public properties', function () {
         ->and($mail->bcc)->toBe(['two@example.com'])
         ->and($mail->subject)->toBe('Hello')
         ->and($mail->attachments)->toBe(['/tmp/a.txt', '/tmp/b.txt']);
+});
+
+it('refreshes an expired access token and persists the new token', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'old_token',
+        'refresh_token' => 'refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'scope',
+        'token_type' => 'Bearer',
+        'created' => time() - 7200,
+    ]);
+
+    $newToken = [
+        'access_token' => 'new_token',
+        'refresh_token' => 'refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'scope',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ];
+
+    $googleClient = Mockery::mock(Client::class);
+    $googleClient->shouldReceive('setAccessToken')->twice();
+    $googleClient->shouldReceive('isAccessTokenExpired')->once()->andReturnTrue();
+    $googleClient->shouldReceive('getRefreshToken')->once()->andReturn('refresh_token');
+    $googleClient->shouldReceive('fetchAccessTokenWithRefreshToken')->once()->with('refresh_token')->andReturn($newToken);
+
+    $client = new GoogleClient($googleClient, new SessionStorageAdapter);
+
+    expect($client())->toBe($googleClient)
+        ->and($client->getAccessToken()->accessToken)->toBe('new_token');
+});
+
+it('throws when the token refresh response contains an error', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'old_token',
+        'refresh_token' => 'refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'scope',
+        'token_type' => 'Bearer',
+        'created' => time() - 7200,
+    ]);
+
+    $googleClient = Mockery::mock(Client::class);
+    $googleClient->shouldReceive('setAccessToken')->once();
+    $googleClient->shouldReceive('isAccessTokenExpired')->once()->andReturnTrue();
+    $googleClient->shouldReceive('getRefreshToken')->once()->andReturn('refresh_token');
+    $googleClient->shouldReceive('fetchAccessTokenWithRefreshToken')->once()->andReturn(['error' => 'invalid_grant']);
+
+    $client = new GoogleClient($googleClient, new SessionStorageAdapter);
+
+    $client();
+})->throws(GoogleClientException::class, 'invalid_grant');
+
+it('builds an rfc compliant mime message with attachments', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'test_token',
+        'refresh_token' => 'dummy_refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'https://www.googleapis.com/auth/gmail.send',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ]);
+
+    $path = sys_get_temp_dir().'/google-api-attachment.txt';
+    file_put_contents($path, str_repeat('A', 100));
+
+    $mail = GoogleApi::gmail()
+        ->from('from@example.com', 'From Name')
+        ->to('to@example.com', 'To Name')
+        ->subject('Hello')
+        ->message('<p>Hi</p>')
+        ->attachment($path);
+
+    $validated = (new ReflectionMethod($mail, 'validateMessage'))->invoke($mail);
+    $built = (new ReflectionMethod($mail, 'buildMessage'))->invoke($mail, $validated);
+
+    expect($built)->toContain('From: From Name <from@example.com>')
+        ->toContain('To: To Name <to@example.com>')
+        ->toContain('Subject: Hello')
+        ->toContain('Content-Type: multipart/mixed')
+        ->toContain('Content-Transfer-Encoding: base64')
+        ->toContain(chunk_split(base64_encode(str_repeat('A', 100)), 76, "\r\n"));
+
+    unlink($path);
+});
+
+it('supports macros on the manager', function () {
+    GoogleApiManager::macro('ping', fn (): string => 'pong');
+
+    expect(GoogleApi::ping())->toBe('pong');
 });
 
 it('builds an access token from an array and back', function () {

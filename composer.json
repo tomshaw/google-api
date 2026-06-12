@@ -19,7 +19,12 @@
     "require": {
         "php": "^8.5",
         "google/apiclient": "^2.18",
-        "illuminate/session": "^13.0"
+        "illuminate/auth": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/session": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/validation": "^13.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",
