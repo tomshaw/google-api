@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TomShaw\GoogleApi\Providers;
 
-use Google\Client;
 use Illuminate\Support\ServiceProvider;
 use TomShaw\GoogleApi\GoogleClient;
+use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
 class GoogleApiServiceProvider extends ServiceProvider
 {
@@ -24,6 +24,8 @@ class GoogleApiServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'google-api');
 
-        $this->app->scoped(GoogleClient::class, fn () => new GoogleClient(new Client));
+        $this->app->bind(StorageAdapterInterface::class, fn () => app(config('google-api.token_storage_adapter')));
+
+        $this->app->scoped(GoogleClient::class, fn () => GoogleClient::make());
     }
 }

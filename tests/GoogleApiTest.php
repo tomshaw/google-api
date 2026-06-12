@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Google\Client;
 use Google\Service\Books;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use PHPUnit\Framework\TestCase;
 use TomShaw\GoogleApi\AccessToken;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
+use TomShaw\GoogleApi\Exceptions\TokenNotFoundException;
 use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Resources\GoogleCalendar;
@@ -32,7 +32,7 @@ beforeEach(function () {
 
     Config::set('google-api', require realpath(__DIR__.DIRECTORY_SEPARATOR.'Mock'.DIRECTORY_SEPARATOR.'config.php'));
 
-    $this->client = new GoogleClient(new Client);
+    $this->client = GoogleClient::make();
 });
 
 afterEach(function () {
@@ -96,6 +96,56 @@ it('returns GoogleCalendar instance', function () {
     $result = GoogleApi::calendar();
 
     expect($result)->toBeInstanceOf(GoogleCalendar::class);
+});
+
+it('returns the authorization url as a string', function () {
+    $url = $this->client->createAuthUrl();
+
+    expect($url)->toBeString()->toContain('accounts.google.com');
+});
+
+it('throws a token not found exception carrying the auth url when invoked without a token', function () {
+    $this->client->deleteAccessToken();
+
+    try {
+        ($this->client)();
+
+        $this->fail('Expected TokenNotFoundException was not thrown.');
+    } catch (TokenNotFoundException $e) {
+        expect($e->authUrl)->toBeString()->toContain('accounts.google.com');
+    }
+});
+
+it('throws when validating an incomplete token payload', function () {
+    $this->client->validate(['access_token' => 'abc']);
+})->throws(GoogleClientException::class);
+
+it('builds mail fluently through public properties', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'test_token',
+        'refresh_token' => 'dummy_refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'https://www.googleapis.com/auth/gmail.send',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ]);
+
+    $mail = GoogleApi::gmail()
+        ->from('from@example.com', 'From Name')
+        ->to('to@example.com', 'To Name')
+        ->cc([' one@example.com '])
+        ->bcc('two@example.com')
+        ->subject('Hello')
+        ->message('<p>Hi</p>')
+        ->attachment('/tmp/a.txt')
+        ->attachments(['/tmp/b.txt']);
+
+    expect($mail->fromEmail)->toBe('from@example.com')
+        ->and($mail->toName)->toBe('To Name')
+        ->and($mail->cc)->toBe(['one@example.com'])
+        ->and($mail->bcc)->toBe(['two@example.com'])
+        ->and($mail->subject)->toBe('Hello')
+        ->and($mail->attachments)->toBe(['/tmp/a.txt', '/tmp/b.txt']);
 });
 
 it('builds an access token from an array and back', function () {

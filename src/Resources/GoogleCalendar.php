@@ -13,7 +13,7 @@ use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleCalendar
 {
-    protected Calendar $service;
+    public private(set) Calendar $service;
 
     protected string $calendarId = 'primary';
 
@@ -80,13 +80,13 @@ final class GoogleCalendar
      * Adds a new event to the Google Calendar.
      *
      * @param  string  $summary  The summary of the event.
-     * @param  string|null  $location  The new location for the event.
-     * @param  string|null  $description  The new description for the event.
      * @param  Carbon  $from  The start time of the event.
      * @param  Carbon  $to  The end time of the event.
+     * @param  string|null  $location  The location for the event.
+     * @param  string|null  $description  The description for the event.
      * @return Event The newly created event.
      */
-    public function addEvent(string $summary, ?string $location, ?string $description, Carbon $from, Carbon $to): Event
+    public function addEvent(string $summary, Carbon $from, Carbon $to, ?string $location = null, ?string $description = null): Event
     {
         $event = new Event;
         $event->setSummary($summary);
@@ -115,13 +115,13 @@ final class GoogleCalendar
      *
      * @param  string  $eventId  The ID of the event to update.
      * @param  string  $summary  The new summary for the event.
-     * @param  string|null  $location  The new location for the event.
-     * @param  string|null  $description  The new description for the event.
      * @param  Carbon  $from  The new start time for the event.
      * @param  Carbon  $to  The new end time for the event.
+     * @param  string|null  $location  The new location for the event.
+     * @param  string|null  $description  The new description for the event.
      * @return Event The updated event.
      */
-    public function updateEvent(string $eventId, string $summary, ?string $location, ?string $description, Carbon $from, Carbon $to): Event
+    public function updateEvent(string $eventId, string $summary, Carbon $from, Carbon $to, ?string $location = null, ?string $description = null): Event
     {
         $event = new Event($this->service->events->get($this->calendarId, $eventId));
         $event->setSummary($summary);
@@ -150,10 +150,9 @@ final class GoogleCalendar
      *
      * @param  string  $eventId  The ID of the event to delete.
      * @param  array<string, mixed>  $optParams  Optional parameters for the delete request.
-     * @return mixed The response from the Google Calendar API.
      */
-    public function deleteEvent(string $eventId, array $optParams = []): mixed
+    public function deleteEvent(string $eventId, array $optParams = []): void
     {
-        return $this->service->events->delete($this->calendarId, $eventId, $optParams);
+        $this->service->events->delete($this->calendarId, $eventId, $optParams);
     }
 }

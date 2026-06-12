@@ -17,7 +17,7 @@ First, ensure you have authorized your application with Google Books scopes in y
 ## Initialization
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 $books = GoogleApi::books();
 ```
@@ -185,7 +185,7 @@ if ($isForSale) {
 ### Search Books and Display Results
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 class BookController extends Controller
 {
@@ -229,7 +229,7 @@ class BookController extends Controller
 ### Get Book Details by ISBN
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 class BookController extends Controller
 {
@@ -275,7 +275,7 @@ class BookController extends Controller
 ### Build a Book Search API with Pagination
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 class BookSearchController extends Controller
 {

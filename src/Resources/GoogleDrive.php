@@ -11,7 +11,7 @@ use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleDrive
 {
-    protected Drive $service;
+    public private(set) Drive $service;
 
     public function __construct(protected GoogleClient $client)
     {

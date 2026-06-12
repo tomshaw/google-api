@@ -15,7 +15,7 @@ First, ensure you have authorized your application with Gmail scopes in your `co
 ## Initialization
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 $gmail = GoogleApi::gmail();
 ```
@@ -32,22 +32,6 @@ Sets both the sender's email and name.
 $gmail->from('sender@example.com', 'John Doe');
 ```
 
-#### setFromEmail(string $fromEmail)
-
-Sets only the sender's email address.
-
-```php
-$gmail->setFromEmail('sender@example.com');
-```
-
-#### setFromName(string $fromName)
-
-Sets only the sender's name.
-
-```php
-$gmail->setFromName('John Doe');
-```
-
 ### Setting Recipient Information
 
 #### to(string $email, string $name)
@@ -56,22 +40,6 @@ Sets both the recipient's email and name.
 
 ```php
 $gmail->to('recipient@example.com', 'Jane Smith');
-```
-
-#### setToEmail(string $toEmail)
-
-Sets only the recipient's email address.
-
-```php
-$gmail->setToEmail('recipient@example.com');
-```
-
-#### setToName(string $toName)
-
-Sets only the recipient's name.
-
-```php
-$gmail->setToName('Jane Smith');
 ```
 
 ### Setting CC and BCC
@@ -140,7 +108,7 @@ $gmail->attachment(storage_path('app/public/invoice.pdf'));
 
 #### attachments(array $paths)
 
-Adds multiple file attachments.
+Adds multiple file attachments. Like `attachment()`, this appends to any attachments already added.
 
 ```php
 $attachments = [
@@ -165,10 +133,30 @@ Sends the email and returns the message object.
 $message = $gmail->send();
 ```
 
+## Public Properties
+
+Everything the fluent methods set is exposed as a public property, readable and writable directly:
+
+```php
+$gmail = GoogleApi::gmail();
+
+$gmail->fromEmail = 'sender@example.com';
+$gmail->fromName = 'John Doe';
+$gmail->toEmail = 'recipient@example.com';
+$gmail->toName = 'Jane Smith';
+$gmail->subject = 'Welcome';
+$gmail->message = '<p>Hello!</p>';
+$gmail->cc = ['cc@example.com'];
+$gmail->bcc = ['bcc@example.com'];
+$gmail->attachments = [storage_path('app/invoice.pdf')];
+```
+
+Email addresses assigned to `cc` and `bcc` are automatically trimmed. The underlying `Google\Service\Gmail` instance is available read-only as `$gmail->service`.
+
 ## Basic Example
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 $gmail = GoogleApi::gmail();
 
@@ -182,7 +170,7 @@ $gmail->from('sender@example.com', 'Company Name')
 ## Using Laravel Mailables
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 use App\Mail\OrderMailable;
 
 $order = Order::find($orderId);
@@ -199,7 +187,7 @@ $gmail->send();
 ## With Attachments
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 $attachments = [
     storage_path('app/invoices/invoice-123.pdf'),
@@ -218,7 +206,7 @@ $gmail->send();
 ## Complete Example with Error Handling
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use App\Mail\WelcomeEmail;
 

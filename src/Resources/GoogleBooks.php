@@ -11,7 +11,7 @@ use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleBooks
 {
-    protected Books $service;
+    public private(set) Books $service;
 
     public function __construct(protected GoogleClient $client)
     {

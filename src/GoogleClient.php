@@ -10,14 +10,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
-use TomShaw\GoogleApi\Http\Resources\AccessTokenResource;
+use TomShaw\GoogleApi\Exceptions\TokenNotFoundException;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 use TomShaw\GoogleApi\Storage\UserScopedStorageAdapter;
 
 class GoogleClient
 {
-    protected StorageAdapterInterface $storageAdapter;
-
     private const array RULES = [
         'access_token' => 'required|string',
         'refresh_token' => 'required|string',
@@ -29,10 +27,19 @@ class GoogleClient
 
     public function __construct(
         protected Client $client,
-    ) {
+        protected StorageAdapterInterface $storageAdapter,
+    ) {}
+
+    /**
+     * Build a client configured from the google-api config file.
+     */
+    public static function make(?StorageAdapterInterface $storageAdapter = null): self
+    {
         if (! file_exists(config('google-api.auth_config'))) {
             throw new GoogleClientException('Unable to load client secrets.');
         }
+
+        $client = new Client;
 
         $client->setAuthConfig(config('google-api.auth_config'));
 
@@ -48,17 +55,18 @@ class GoogleClient
 
         $client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
 
-        $this->setStorage(app(config('google-api.token_storage_adapter')));
+        return new self($client, $storageAdapter ?? app(StorageAdapterInterface::class));
     }
 
-    public function __invoke(): ?Client
+    /**
+     * @throws TokenNotFoundException When no token is stored; the exception carries the authorization URL.
+     */
+    public function __invoke(): Client
     {
         $accessToken = $this->getAccessToken();
 
         if ($accessToken === null) {
-            $this->createAuthUrl();
-
-            return null;
+            throw new TokenNotFoundException(authUrl: $this->createAuthUrl());
         }
 
         try {
@@ -152,11 +160,12 @@ class GoogleClient
         return $clone;
     }
 
-    public function createAuthUrl(): void
+    /**
+     * Build the OAuth2 authorization URL the user should be redirected to.
+     */
+    public function createAuthUrl(): string
     {
-        $authUrl = $this->client->createAuthUrl();
-        header('Location: '.filter_var($authUrl, FILTER_SANITIZE_URL));
-        exit;
+        return $this->client->createAuthUrl();
     }
 
     /**
@@ -164,15 +173,7 @@ class GoogleClient
      */
     public function fetchAccessTokenWithRefreshToken(?string $refreshToken): array
     {
-        $response = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
-
-        $resource = new AccessTokenResource($response);
-
-        if (array_key_exists('error', $resource->resource)) {
-            throw new GoogleClientException($resource->resource['error']);
-        }
-
-        return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
+        return $this->resolveAccessTokenResponse($this->client->fetchAccessTokenWithRefreshToken($refreshToken));
     }
 
     /**
@@ -180,29 +181,37 @@ class GoogleClient
      */
     public function fetchAccessTokenWithAuthCode(string $authCode): array
     {
-        $response = $this->client->fetchAccessTokenWithAuthCode($authCode);
-
-        $resource = new AccessTokenResource($response);
-
-        if (array_key_exists('error', $resource->resource)) {
-            throw new GoogleClientException($resource->resource['error']);
-        }
-
-        return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
+        return $this->resolveAccessTokenResponse($this->client->fetchAccessTokenWithAuthCode($authCode));
     }
 
     /**
+     * @param  array<string, mixed>  $token
      * @return array<string, mixed>
      */
-    public function validate(string $accessToken, string $refreshToken, int $expiresIn, string $scope, string $tokenType, int $created): array
+    public function validate(array $token): array
     {
-        $validator = Validator::make(['access_token' => $accessToken, 'refresh_token' => $refreshToken, 'expires_in' => $expiresIn, 'scope' => $scope, 'token_type' => $tokenType, 'created' => $created], self::RULES);
+        $validator = Validator::make($token, self::RULES);
 
         if ($validator->fails()) {
             throw new GoogleClientException($validator->messages()->first());
         }
 
         return $validator->validated();
+    }
+
+    /**
+     * @param  array<string, mixed>  $response
+     * @return array<string, mixed>
+     */
+    protected function resolveAccessTokenResponse(array $response): array
+    {
+        if (array_key_exists('error', $response)) {
+            $error = $response['error'];
+
+            throw new GoogleClientException(is_string($error) ? $error : (string) json_encode($error));
+        }
+
+        return $this->validate($response);
     }
 
     private static function configString(string $key): string

@@ -15,14 +15,14 @@ First, ensure you have authorized your application with Google Calendar scopes i
 ## Initialization
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 $calendar = GoogleApi::calendar();
 ```
 
 ## Setting the Calendar ID
 
-Before performing operations, you must set the calendar ID (typically the user's email address):
+The calendar ID defaults to `primary` (the authorized user's primary calendar), so no setup is needed for the common case. To work with another calendar, set its ID (typically an email address):
 
 ```php
 $calendar->setCalendarId('user@example.com');
@@ -73,26 +73,28 @@ Creates a new calendar event.
 
 **Parameters:**
 - `$summary` (string) - The event title/summary
-- `$location` (string|null) - Event location (optional)
-- `$description` (string|null) - Event description (optional)
 - `$from` (Carbon) - Event start time
 - `$to` (Carbon) - Event end time
+- `$location` (string|null, default: null) - Event location (optional)
+- `$description` (string|null, default: null) - Event description (optional)
 
 **Returns:** `Google\Service\Calendar\Event`
 
 ```php
 use Carbon\Carbon;
 
-$calendar = GoogleApi::calendar()->setCalendarId('user@example.com');
-
-$summary = 'Team Meeting';
-$location = '123 Conference Room, Office Building';
-$description = 'Quarterly review meeting';
+$calendar = GoogleApi::calendar();
 
 $from = Carbon::now()->timezone('America/Chicago')->addDay()->setTime(13, 0);
 $to = $from->copy()->addHour();
 
-$event = $calendar->addEvent($summary, $location, $description, $from, $to);
+$event = $calendar->addEvent(
+    summary: 'Team Meeting',
+    from: $from,
+    to: $to,
+    location: '123 Conference Room, Office Building',
+    description: 'Quarterly review meeting',
+);
 
 // Save the event ID for future updates
 $eventId = $event->getId();
@@ -105,27 +107,29 @@ Updates an existing calendar event.
 **Parameters:**
 - `$eventId` (string) - The ID of the event to update
 - `$summary` (string) - The new event title/summary
-- `$location` (string|null) - New event location (optional)
-- `$description` (string|null) - New event description (optional)
 - `$from` (Carbon) - New event start time
 - `$to` (Carbon) - New event end time
+- `$location` (string|null, default: null) - New event location (optional)
+- `$description` (string|null, default: null) - New event description (optional)
 
 **Returns:** `Google\Service\Calendar\Event`
 
 ```php
 use Carbon\Carbon;
 
-$calendar = GoogleApi::calendar()->setCalendarId('user@example.com');
-
-$eventId = 'event_id_here';
-$summary = 'Updated Team Meeting';
-$location = '456 Different Room';
-$description = 'Rescheduled quarterly review';
+$calendar = GoogleApi::calendar();
 
 $from = Carbon::now()->timezone('America/Chicago')->addDays(2)->setTime(14, 0);
 $to = $from->copy()->addHours(2);
 
-$updatedEvent = $calendar->updateEvent($eventId, $summary, $location, $description, $from, $to);
+$updatedEvent = $calendar->updateEvent(
+    eventId: 'event_id_here',
+    summary: 'Updated Team Meeting',
+    from: $from,
+    to: $to,
+    location: '456 Different Room',
+    description: 'Rescheduled quarterly review',
+);
 ```
 
 ### deleteEvent
@@ -136,34 +140,34 @@ Deletes a calendar event.
 - `$eventId` (string) - The ID of the event to delete
 - `$optParams` (array, default: []) - Optional parameters for the delete request
 
-**Returns:** Mixed (API response)
+**Returns:** void
 
 ```php
-$calendar = GoogleApi::calendar()->setCalendarId('user@example.com');
-
-$calendar->deleteEvent('event_id_here');
+GoogleApi::calendar()->deleteEvent('event_id_here');
 ```
 
 ## Complete Example
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 use Carbon\Carbon;
 
 class CalendarController extends Controller
 {
     public function createEvent()
     {
-        $calendar = GoogleApi::calendar()->setCalendarId('user@example.com');
-
-        $summary = 'Project Deadline';
-        $location = 'Remote';
-        $description = 'Final submission for Q4 project';
+        $calendar = GoogleApi::calendar();
 
         $from = Carbon::now()->timezone('America/Chicago')->addWeek()->setTime(17, 0);
         $to = $from->copy()->addHour();
 
-        $event = $calendar->addEvent($summary, $location, $description, $from, $to);
+        $event = $calendar->addEvent(
+            summary: 'Project Deadline',
+            from: $from,
+            to: $to,
+            location: 'Remote',
+            description: 'Final submission for Q4 project',
+        );
 
         return response()->json([
             'event_id' => $event->getId(),

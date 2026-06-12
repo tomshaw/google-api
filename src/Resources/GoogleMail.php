@@ -13,28 +13,32 @@ use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleMail
 {
-    protected Gmail $service;
+    public private(set) Gmail $service;
 
-    protected ?string $toName = null;
+    public ?string $toName = null;
 
-    protected ?string $toEmail = null;
-
-    /** @var array<int, string> */
-    protected array $cc = [];
+    public ?string $toEmail = null;
 
     /** @var array<int, string> */
-    protected array $bCC = [];
-
-    protected ?string $fromName = null;
-
-    protected ?string $fromEmail = null;
-
-    protected ?string $subject = null;
-
-    protected ?string $message = null;
+    public array $cc = [] {
+        set => array_map(trim(...), $value);
+    }
 
     /** @var array<int, string> */
-    protected array $attachments = [];
+    public array $bcc = [] {
+        set => array_map(trim(...), $value);
+    }
+
+    public ?string $fromName = null;
+
+    public ?string $fromEmail = null;
+
+    public ?string $subject = null;
+
+    public ?string $message = null;
+
+    /** @var array<int, string> */
+    public array $attachments = [];
 
     public function __construct(protected GoogleClient $client)
     {
@@ -42,150 +46,55 @@ final class GoogleMail
     }
 
     /**
-     * Sets the 'to' name.
-     *
-     * @param  string  $toName  The name to set.
-     * @return GoogleMail The current instance.
+     * Sets the 'from' name and email.
      */
-    public function setToName(string $toName): GoogleMail
+    public function from(string $email, string $name): self
     {
-        $this->toName = $toName;
+        $this->fromEmail = $email;
+        $this->fromName = $name;
 
         return $this;
     }
 
     /**
-     * Gets the 'to' name.
-     *
-     * @return string|null The 'to' name.
+     * Sets the 'to' name and email.
      */
-    public function getToName(): ?string
+    public function to(string $email, string $name): self
     {
-        return $this->toName;
-    }
-
-    /**
-     * Sets the 'to' email.
-     *
-     * @param  string  $toEmail  The email to set.
-     * @return GoogleMail The current instance.
-     */
-    public function setToEmail(string $toEmail): GoogleMail
-    {
-        $this->toEmail = $toEmail;
+        $this->toEmail = $email;
+        $this->toName = $name;
 
         return $this;
     }
 
     /**
-     * Gets the 'to' email.
+     * Adds one or more carbon copy emails.
      *
-     * @return string|null The 'to' email.
+     * @param  string|array<int, string>  $email
      */
-    public function getToEmail(): ?string
+    public function cc(string|array $email): self
     {
-        return $this->toEmail;
-    }
-
-    /**
-     * Sets the carbon copy emails.
-     *
-     * @param  array<int, string>  $cc  The emails to set.
-     * @return GoogleMail The current instance.
-     */
-    public function setCC(array $cc = []): GoogleMail
-    {
-        $this->cc = $cc;
+        $this->cc = array_merge($this->cc, (array) $email);
 
         return $this;
     }
 
     /**
-     * Gets the carbon copy emails.
+     * Adds one or more blind carbon copy emails.
      *
-     * @return array<int, string> The carbon copy emails.
+     * @param  string|array<int, string>  $email
      */
-    public function getCC(): array
+    public function bcc(string|array $email): self
     {
-        return $this->cc;
-    }
-
-    /**
-     * Sets the blind carbon copy emails.
-     *
-     * @param  array<int, string>  $bCC  The emails to set.
-     * @return GoogleMail The current instance.
-     */
-    public function setBCC(array $bCC = []): GoogleMail
-    {
-        $this->bCC = $bCC;
+        $this->bcc = array_merge($this->bcc, (array) $email);
 
         return $this;
-    }
-
-    /**
-     * Gets the blind carbon copy emails.
-     *
-     * @return array<int, string> The blind carbon copy emails.
-     */
-    public function getBCC(): array
-    {
-        return $this->bCC;
-    }
-
-    /**
-     * Sets the 'from' name.
-     *
-     * @param  string  $fromName  The name to set.
-     * @return GoogleMail The current instance.
-     */
-    public function setFromName(string $fromName): GoogleMail
-    {
-        $this->fromName = $fromName;
-
-        return $this;
-    }
-
-    /**
-     * Gets the 'from' name.
-     *
-     * @return string|null The 'from' name.
-     */
-    public function getFromName(): ?string
-    {
-        return $this->fromName;
-    }
-
-    /**
-     * Sets the 'from' email.
-     *
-     * @param  string  $fromEmail  The email to set.
-     * @return GoogleMail The current instance.
-     */
-    public function setFromEmail(string $fromEmail): GoogleMail
-    {
-        $this->fromEmail = $fromEmail;
-
-        return $this;
-    }
-
-    /**
-     * Gets the 'from' email.
-     *
-     * @return string|null The 'from' email.
-     */
-    public function getFromEmail(): ?string
-    {
-        return $this->fromEmail;
     }
 
     /**
      * Sets the subject of the email.
-     *
-     * @param  string  $subject  The subject to set.
-     * @return GoogleMail The current instance.
      */
-    public function setSubject(string $subject): GoogleMail
+    public function subject(string $subject): self
     {
         $this->subject = $subject;
 
@@ -193,22 +102,9 @@ final class GoogleMail
     }
 
     /**
-     * Gets the subject of the email.
-     *
-     * @return string|null The subject of the email.
-     */
-    public function getSubject(): ?string
-    {
-        return $this->subject;
-    }
-
-    /**
      * Sets the message of the email.
-     *
-     * @param  string  $message  The message to set.
-     * @return GoogleMail The current instance.
      */
-    public function setMessage(string $message): GoogleMail
+    public function message(string $message): self
     {
         $this->message = $message;
 
@@ -216,125 +112,17 @@ final class GoogleMail
     }
 
     /**
-     * Gets the message of the email.
-     *
-     * @return string|null The message of the email.
-     */
-    public function getMessage(): ?string
-    {
-        return $this->message;
-    }
-
-    /**
-     * Sets both 'from' name and email in one method call.
-     *
-     * @param  string  $email  The 'from' email to set.
-     * @param  string  $name  The 'from' name to set.
-     * @return GoogleMail The current instance.
-     */
-    public function from(string $email, string $name): GoogleMail
-    {
-        $this->setFromEmail($email);
-        $this->setFromName($name);
-
-        return $this;
-    }
-
-    /**
-     * Sets both 'to' name and email in one method call.
-     *
-     * @param  string  $email  The 'to' email to set.
-     * @param  string  $name  The 'to' name to set.
-     * @return GoogleMail The current instance.
-     */
-    public function to(string $email, string $name): GoogleMail
-    {
-        $this->setToEmail($email);
-        $this->setToName($name);
-
-        return $this;
-    }
-
-    /**
-     * Sets the carbon copy emails.
-     *
-     * @param  string|array<int, string>  $email  The email to set.
-     * @return GoogleMail The current instance.
-     */
-    public function cc(string|array $email): GoogleMail
-    {
-        if (is_array($email)) {
-            $this->cc = array_merge($this->cc, $email);
-        } else {
-            $this->cc[] = $email;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the blind carbon copy emails.
-     *
-     * @param  string|array<int, string>  $email  The email to set.
-     * @return GoogleMail The current instance.
-     */
-    public function bcc(string|array $email): GoogleMail
-    {
-        if (is_array($email)) {
-            $this->bCC = array_merge($this->bCC, $email);
-        } else {
-            $this->bCC[] = $email;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the subject of the email.
-     *
-     * @param  string  $subject  The subject to set.
-     * @return GoogleMail The current instance.
-     */
-    public function subject(string $subject): GoogleMail
-    {
-        $this->setSubject($subject);
-
-        return $this;
-    }
-
-    /**
-     * Sets the message of the email.
-     *
-     * @param  string  $message  The message to set.
-     * @return GoogleMail The current instance.
-     */
-    public function message(string $message): GoogleMail
-    {
-        $this->setMessage($message);
-
-        return $this;
-    }
-
-    /**
      * Sets the message of the email using a Mailable instance.
-     *
-     * @param  Mailable  $mailable  The Mailable instance.
-     * @return GoogleMail The current instance.
      */
-    public function mailable(Mailable $mailable): GoogleMail
+    public function mailable(Mailable $mailable): self
     {
-        $message = $mailable->render();
-
-        $this->setMessage($message);
+        $this->message = $mailable->render();
 
         return $this;
     }
 
     /**
-     * Add a single email attachment.
-     *
-     * @param  string  $path  The path to the attachment.
-     * @return GoogleMail The current instance.
+     * Adds a single email attachment.
      */
     public function attachment(string $path): self
     {
@@ -344,22 +132,19 @@ final class GoogleMail
     }
 
     /**
-     * Add an array of email attachments.
+     * Adds an array of email attachments.
      *
-     * @param  array<int, string>  $paths  The path to the attachment.
-     * @return GoogleMail The current instance.
+     * @param  array<int, string>  $paths
      */
     public function attachments(array $paths): self
     {
-        $this->attachments = $paths;
+        $this->attachments = array_merge($this->attachments, $paths);
 
         return $this;
     }
 
     /**
      * Sends the email.
-     *
-     * @return Message The message object.
      */
     public function send(): Message
     {
@@ -380,8 +165,7 @@ final class GoogleMail
     /**
      * Builds the email message.
      *
-     * @param  array<string, mixed>  $validated  The validated data.
-     * @return string The email message.
+     * @param  array<string, mixed>  $validated
      */
     protected function buildMessage(array $validated): string
     {
@@ -389,10 +173,10 @@ final class GoogleMail
 
         $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
         $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
-        if (count($this->getCC())) {
+        if (count($this->cc)) {
             $headers .= "CC: {$this->arrayToString($validated['cc'])}\r\n";
         }
-        if (count($this->getBCC())) {
+        if (count($this->bcc)) {
             $headers .= "BCC: {$this->arrayToString($validated['bcc'])}\r\n";
         }
         $headers .= "Subject: {$validated['subject']}\r\n";
@@ -415,7 +199,7 @@ final class GoogleMail
 
         $headers .= "Content-Type: text/html; charset=utf-8\r\n";
         $headers .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $headers .= "{$validated['message']}\r\n\r\n";
+        $headers .= "{$this->message}\r\n\r\n";
 
         if (! empty($this->attachments)) {
             $headers .= "--$boundary--";
@@ -429,34 +213,31 @@ final class GoogleMail
      *
      * The maximum total size is set to 25MB, which is the limit for attachments sent through Gmail.
      *
-     * @param  array<int, string>  $attachments  The attachments to validate.
+     * @param  array<int, string>  $attachments
      *
-     * @throws \Exception If the attachments are invalid.
+     * @throws GoogleApiException If the attachments are invalid.
      */
     protected function validateAttachments(array $attachments): void
     {
         $totalSize = 0;
-        $maxTotalSize = 25 * 1024 * 1024; // 25 MB
+        $maxTotalSize = 25 * 1024 * 1024;
 
         foreach ($attachments as $attachment) {
             if (! file_exists($attachment)) {
-                throw new \Exception("File $attachment does not exist");
+                throw new GoogleApiException("File $attachment does not exist");
             }
             if (! is_readable($attachment)) {
-                throw new \Exception("File $attachment is not readable");
+                throw new GoogleApiException("File $attachment is not readable");
             }
             $totalSize += filesize($attachment);
         }
         if ($totalSize > $maxTotalSize) {
-            throw new \Exception('Total size of attachments exceeds the maximum size limit');
+            throw new GoogleApiException('Total size of attachments exceeds the maximum size limit');
         }
     }
 
     /**
      * Encodes a message into a URL-safe format.
-     *
-     * @param  string  $message  The message to encode.
-     * @return string The encoded message.
      */
     protected function encodeUrlSafeMessage(string $message): string
     {
@@ -464,38 +245,31 @@ final class GoogleMail
     }
 
     /**
-     * Converts the carbon copy emails to a string.
+     * Converts a list of emails to a comma separated string.
      *
-     * @param  array<int, string>  $emails  The emails to convert.
-     * @return string The carbon copy emails as a string.
+     * @param  array<int, string>  $emails
      */
-    public function arrayToString(array $emails): string
+    protected function arrayToString(array $emails): string
     {
-        $data = [];
-
-        foreach ($emails as $email) {
-            $data[] = trim($email);
-        }
-
-        return implode(', ', $data);
+        return implode(', ', $emails);
     }
 
     /**
      * Validates the email message.
      *
-     * @return array<string, mixed> The validated data.
+     * @return array<string, mixed>
      */
     protected function validateMessage(): array
     {
         $validator = Validator::make([
-            'fromEmail' => $this->getFromEmail(),
-            'fromName' => $this->getFromName(),
-            'toEmail' => $this->getToEmail(),
-            'toName' => $this->getToName(),
-            'subject' => $this->getSubject(),
-            'message' => $this->getMessage(),
-            'cc' => $this->getCC(),
-            'bcc' => $this->getBCC(),
+            'fromEmail' => $this->fromEmail,
+            'fromName' => $this->fromName,
+            'toEmail' => $this->toEmail,
+            'toName' => $this->toName,
+            'subject' => $this->subject,
+            'message' => $this->message,
+            'cc' => $this->cc,
+            'bcc' => $this->bcc,
         ], [
             'fromEmail' => 'required|email',
             'fromName' => 'required',

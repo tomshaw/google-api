@@ -17,7 +17,7 @@ First, ensure you have authorized your application with Google Drive scopes in y
 ## Initialization
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 $drive = GoogleApi::drive();
 ```
@@ -186,7 +186,7 @@ $files = $drive->listFiles([
 ### List Recent Files
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 class DriveController extends Controller
 {
@@ -218,7 +218,7 @@ class DriveController extends Controller
 ### Upload File from Laravel Storage
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 use Illuminate\Support\Facades\Storage;
 
 class DriveController extends Controller
@@ -250,7 +250,7 @@ class DriveController extends Controller
 ### Search and Download Files
 
 ```php
-use TomShaw\GoogleApi\Facades\GoogleApi;
+use TomShaw\GoogleApi\GoogleApi;
 
 class DriveController extends Controller
 {

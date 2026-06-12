@@ -69,15 +69,17 @@ Here's a brief explanation of the application configuration file used to set up 
 
 - `application_name`: This is the name of your application.
 
-- `prompt`: This is the type of prompt that will be presented to the user during the OAuth2.0 flow. The 'consent' prompt asks the user to grant your application access to the scopes you're requesting.
+- `prompt`: This is the type of prompt that will be presented to the user during the OAuth2.0 flow. The `Prompt::Consent` prompt asks the user to grant your application access to the scopes you're requesting.
 
-- `approval_prompt`: This is another setting for the OAuth2.0 flow. The 'auto' setting means that the user will only be prompted for approval the first time they authenticate your application.
+- `approval_prompt`: This is another setting for the OAuth2.0 flow. The `ApprovalPrompt::Auto` setting means that the user will only be prompted for approval the first time they authenticate your application.
 
-- `access_type`: This is set to 'offline' to allow your application to access the user's data when the user is not present.
+- `access_type`: This is set to `AccessType::Offline` to allow your application to access the user's data when the user is not present.
 
 - `include_grant_scopes`: This is set to true to include the scopes from the initial authorization in the refresh token request.
 
 - `service_scopes`: These are the scopes your application is requesting access to.
+
+The `prompt`, `approval_prompt`, and `access_type` options accept the `TomShaw\GoogleApi\Enums\Prompt`, `ApprovalPrompt`, and `AccessType` enums (plain strings still work).
 
 The Google API client uses these settings to handle the OAuth2.0 flow and interact with the Google APIs.
 
@@ -98,33 +100,87 @@ class GoogleAuthController extends Controller
 {
     public function index(GoogleClient $client)
     {
-        return $client->createAuthUrl();
+        return redirect()->away($client->createAuthUrl());
     }
 
     public function callback(Request $request, GoogleClient $client)
     {
-        $authCode = $request->get('code');
+        $accessToken = $client->fetchAccessTokenWithAuthCode($request->get('code'));
 
-        $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
-
-        if ($accessToken) {
-            $client->setAccessToken($accessToken);
-        }
+        $client->setAccessToken($accessToken);
 
         return redirect()->route('homepage');
     }
 }
 ```
 
+Once a token is stored, resolve any service through the `GoogleApi` facade. If no token is present a `TokenNotFoundException` is thrown carrying the authorization URL, so unauthorized users can be redirected into the OAuth flow:
+
+```php
+use TomShaw\GoogleApi\GoogleApi;
+use TomShaw\GoogleApi\Exceptions\TokenNotFoundException;
+
+try {
+    $events = GoogleApi::calendar()->listEvents();
+} catch (TokenNotFoundException $e) {
+    return redirect()->away($e->authUrl);
+}
+```
+
+### Access Tokens
+
+`GoogleClient::getAccessToken()` returns a readonly `TomShaw\GoogleApi\AccessToken` value object (or `null` when no token is stored):
+
+```php
+$token = $client->getAccessToken();
+
+$token->accessToken;        // string|null
+$token->isExpired();        // bool
+$token->hasRefreshToken();  // bool
+$token->toArray();          // array<string, int|string>
+```
+
+### Acting on Behalf of a User
+
+When using a user-scoped storage adapter such as the database adapter, tokens can be read and written for a specific user — useful in queued jobs and console commands where no one is authenticated:
+
+```php
+use TomShaw\GoogleApi\GoogleApi;
+
+GoogleApi::forUser($user)
+    ->gmail()
+    ->from('billing@example.com', 'Billing')
+    ->to($user->email, $user->name)
+    ->subject('Your invoice')
+    ->message('<p>Thanks!</p>')
+    ->send();
+```
+
+### Using Any Google Service
+
+The four bundled adapters cover Calendar, Gmail, Drive, and Books. Any other Google service can be instantiated with the authorized client:
+
+```php
+use Google\Service\Sheets;
+use TomShaw\GoogleApi\GoogleApi;
+
+$sheets = GoogleApi::service(Sheets::class);
+```
+
 ## Storage Adapters
 
 You can provide your own storage mechanism such as file or Redis by setting the `token_storage_adapter` configuration option.
 
-> Storage adapters must implement the `StorageAdapterInterface`.
+> Storage adapters must implement the `StorageAdapterInterface`. Implement `UserScopedStorageAdapter` as well if your adapter should support `forUser()`.
 
 ```php
-'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseTokenStorage::class,
+'token_storage_adapter' => TomShaw\GoogleApi\Storage\DatabaseStorageAdapter::class,
 ```
+
+Two adapters ship with the package:
+
+- `DatabaseStorageAdapter` (default) - persists tokens to the `google_tokens` table keyed by user, with the token columns encrypted at rest. Supports `forUser()`.
+- `SessionStorageAdapter` - keeps the token in the current session.
 
 ## Services Adapters
 
