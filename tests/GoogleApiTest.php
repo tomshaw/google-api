@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Google\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;

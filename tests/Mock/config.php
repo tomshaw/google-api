@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Google\Service\Calendar;
 use Google\Service\Gmail;
 use TomShaw\GoogleApi\Storage\SessionStorageAdapter;
