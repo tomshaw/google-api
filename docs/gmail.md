@@ -286,5 +286,7 @@ Validation errors throw `GoogleApiException` with descriptive messages.
 - All emails are sent as HTML by default
 - The sender email must be authorized in your Google account
 - Attachments are automatically base64 encoded
+- The MIME message is assembled in a temporary stream that spills to disk past 2MB, and attachments are encoded in chunks — large attachments never need to fit in memory
+- When attachments total more than 5MB, the message is sent through Gmail's resumable media upload (one 1MB chunk in memory at a time) instead of an inline base64 payload
 - Multiple CC and BCC recipients are supported
 - Laravel Mailables are rendered before sending

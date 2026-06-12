@@ -4,16 +4,40 @@ declare(strict_types=1);
 
 namespace TomShaw\GoogleApi\Resources;
 
+use Google\Http\MediaFileUpload;
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
 use Google\Service\Gmail\Resource\UsersMessages;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Validator;
+use Psr\Http\Message\RequestInterface;
 use TomShaw\GoogleApi\Exceptions\GoogleApiException;
 use TomShaw\GoogleApi\GoogleClient;
 
 final class GoogleMail
 {
+    /**
+     * Attachment totals above this threshold are sent via resumable
+     * media upload instead of an inline base64url-encoded payload.
+     */
+    private const int STREAM_UPLOAD_THRESHOLD = 5 * 1024 * 1024;
+
+    /**
+     * Resumable upload chunk size; must be a multiple of 256 KiB.
+     */
+    private const int UPLOAD_CHUNK_SIZE = 4 * 256 * 1024;
+
+    /**
+     * 57 raw bytes encode to one 76-character base64 line (RFC 2045),
+     * so reads in multiples of 57 keep lines aligned across chunks.
+     */
+    private const int ATTACHMENT_READ_BYTES = 57 * 1024;
+
+    /**
+     * Bytes the MIME temp stream may hold in memory before spilling to disk.
+     */
+    private const int STREAM_MEMORY_LIMIT = 2 * 1024 * 1024;
+
     public private(set) Gmail $service;
 
     public ?string $toName = null;
@@ -146,6 +170,9 @@ final class GoogleMail
 
     /**
      * Sends the email.
+     *
+     * Messages whose attachments exceed the streaming threshold are uploaded
+     * with the Gmail resumable media upload; everything else is sent inline.
      */
     public function send(): Message
     {
@@ -155,21 +182,35 @@ final class GoogleMail
 
         $this->validateMessage();
 
-        $message = $this->buildMessage();
+        $stream = $this->buildMimeStream();
 
-        $msg = new Message;
-        $msg->setRaw($this->encodeUrlSafeMessage($message));
+        try {
+            if ($this->usesStreamedUpload()) {
+                return $this->sendStreamed($stream);
+            }
 
-        return $this->userMessages()->send('me', $msg);
+            return $this->sendInline($stream);
+        } finally {
+            fclose($stream);
+        }
     }
 
     /**
-     * Builds the email message.
+     * Builds the email MIME message into a temporary stream, spilling to
+     * disk once it outgrows the in-memory limit.
+     *
+     * @return resource
      */
-    protected function buildMessage(): string
+    protected function buildMimeStream()
     {
         if ($this->fromEmail === null || $this->fromName === null || $this->toEmail === null || $this->toName === null || $this->subject === null || $this->message === null) {
             throw new GoogleApiException('Cannot build an email message before it passes validation.');
+        }
+
+        $stream = fopen('php://temp/maxmemory:'.self::STREAM_MEMORY_LIMIT, 'r+b');
+
+        if ($stream === false) {
+            throw new GoogleApiException('Unable to open a temporary stream for the email message.');
         }
 
         $boundary = bin2hex(random_bytes(16));
@@ -185,36 +226,167 @@ final class GoogleMail
         $headers .= "Subject: {$this->subject}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
 
+        fwrite($stream, $headers);
+
         if (! empty($this->attachments)) {
-            $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n";
+            fwrite($stream, "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n\r\n");
 
             foreach ($this->attachments as $attachment) {
-                $contents = file_get_contents($attachment);
-
-                if ($contents === false) {
-                    throw new GoogleApiException("File $attachment could not be read");
-                }
-
-                $attachmentData = chunk_split(base64_encode($contents), 76, "\r\n");
-
-                $headers .= "--$boundary\r\n";
-                $headers .= 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n";
-                $headers .= "Content-Transfer-Encoding: base64\r\n\r\n";
-                $headers .= $attachmentData."\r\n";
+                fwrite($stream, "--$boundary\r\n");
+                fwrite($stream, 'Content-Type: '.mime_content_type($attachment).'; name="'.basename($attachment)."\"\r\n");
+                fwrite($stream, "Content-Transfer-Encoding: base64\r\n\r\n");
+                $this->writeBase64File($stream, $attachment);
+                fwrite($stream, "\r\n");
             }
 
-            $headers .= "--$boundary\r\n";
+            fwrite($stream, "--$boundary\r\n");
         }
 
-        $headers .= "Content-Type: text/html; charset=utf-8\r\n";
-        $headers .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $headers .= "{$this->message}\r\n\r\n";
+        fwrite($stream, "Content-Type: text/html; charset=utf-8\r\n");
+        fwrite($stream, "Content-Transfer-Encoding: 8bit\r\n\r\n");
+        fwrite($stream, "{$this->message}\r\n\r\n");
 
         if (! empty($this->attachments)) {
-            $headers .= "--$boundary--";
+            fwrite($stream, "--$boundary--");
         }
 
-        return $headers;
+        return $stream;
+    }
+
+    /**
+     * Base64-encodes a file onto the MIME stream in line-aligned chunks.
+     *
+     * @param  resource  $stream
+     */
+    protected function writeBase64File($stream, string $path): void
+    {
+        $file = fopen($path, 'rb');
+
+        if ($file === false) {
+            throw new GoogleApiException("File $path could not be read");
+        }
+
+        try {
+            while (! feof($file)) {
+                $chunk = fread($file, self::ATTACHMENT_READ_BYTES);
+
+                if ($chunk === false) {
+                    throw new GoogleApiException("File $path could not be read");
+                }
+
+                if ($chunk === '') {
+                    continue;
+                }
+
+                fwrite($stream, chunk_split(base64_encode($chunk), 76, "\r\n"));
+            }
+        } finally {
+            fclose($file);
+        }
+    }
+
+    /**
+     * Sends the MIME stream as an inline base64url-encoded payload.
+     *
+     * @param  resource  $stream
+     */
+    protected function sendInline($stream): Message
+    {
+        rewind($stream);
+
+        $contents = stream_get_contents($stream);
+
+        if ($contents === false) {
+            throw new GoogleApiException('Unable to read the email message stream.');
+        }
+
+        $msg = new Message;
+        $msg->setRaw($this->encodeUrlSafeMessage($contents));
+
+        return $this->userMessages()->send('me', $msg);
+    }
+
+    /**
+     * Sends the MIME stream through the Gmail resumable media upload,
+     * keeping at most one chunk in memory at a time.
+     *
+     * @param  resource  $stream
+     */
+    protected function sendStreamed($stream): Message
+    {
+        $client = $this->service->getClient();
+
+        $client->setDefer(true);
+
+        try {
+            $request = $this->userMessages()->call('send', [['userId' => 'me', 'postBody' => new Message]], Message::class);
+
+            if (! $request instanceof RequestInterface) {
+                throw new GoogleApiException('Expected a deferred request for the streamed email upload.');
+            }
+
+            $media = new MediaFileUpload($client, $request, 'message/rfc822', '', true, self::UPLOAD_CHUNK_SIZE);
+            $media->setFileSize($this->streamSize($stream));
+
+            rewind($stream);
+
+            $status = false;
+
+            while ($status === false && ! feof($stream)) {
+                $chunk = fread($stream, self::UPLOAD_CHUNK_SIZE);
+
+                if ($chunk === false) {
+                    throw new GoogleApiException('Unable to read the email message stream.');
+                }
+
+                $status = $media->nextChunk($chunk);
+            }
+
+            if (! $status instanceof Message) {
+                throw new GoogleApiException('The streamed email upload did not complete.');
+            }
+
+            return $status;
+        } finally {
+            $client->setDefer(false);
+        }
+    }
+
+    /**
+     * Whether the attachments are large enough to warrant a streamed upload.
+     */
+    protected function usesStreamedUpload(): bool
+    {
+        return $this->attachmentsTotalSize() > self::STREAM_UPLOAD_THRESHOLD;
+    }
+
+    protected function attachmentsTotalSize(): int
+    {
+        $total = 0;
+
+        foreach ($this->attachments as $attachment) {
+            $size = filesize($attachment);
+
+            if ($size !== false) {
+                $total += $size;
+            }
+        }
+
+        return $total;
+    }
+
+    /**
+     * @param  resource  $stream
+     */
+    protected function streamSize($stream): int
+    {
+        $stats = fstat($stream);
+
+        if ($stats === false) {
+            throw new GoogleApiException('Unable to determine the email message size.');
+        }
+
+        return $stats['size'];
     }
 
     /**

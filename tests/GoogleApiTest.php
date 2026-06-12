@@ -223,7 +223,10 @@ it('builds an rfc compliant mime message with attachments', function () {
         ->attachment($path);
 
     (new ReflectionMethod($mail, 'validateMessage'))->invoke($mail);
-    $built = (new ReflectionMethod($mail, 'buildMessage'))->invoke($mail);
+    $stream = (new ReflectionMethod($mail, 'buildMimeStream'))->invoke($mail);
+    rewind($stream);
+    $built = stream_get_contents($stream);
+    fclose($stream);
 
     expect($built)->toContain('From: From Name <from@example.com>')
         ->toContain('To: To Name <to@example.com>')
@@ -233,6 +236,61 @@ it('builds an rfc compliant mime message with attachments', function () {
         ->toContain(chunk_split(base64_encode(str_repeat('A', 100)), 76, "\r\n"));
 
     unlink($path);
+});
+
+it('streams attachment base64 in chunks identical to whole-file encoding', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'test_token',
+        'refresh_token' => 'dummy_refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'https://www.googleapis.com/auth/gmail.send',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ]);
+
+    $contents = random_bytes(150_000);
+    $path = sys_get_temp_dir().'/google-api-large-attachment.bin';
+    file_put_contents($path, $contents);
+
+    $mail = GoogleApi::gmail()
+        ->from('from@example.com', 'From Name')
+        ->to('to@example.com', 'To Name')
+        ->subject('Hello')
+        ->message('<p>Hi</p>')
+        ->attachment($path);
+
+    $stream = (new ReflectionMethod($mail, 'buildMimeStream'))->invoke($mail);
+    rewind($stream);
+    $built = stream_get_contents($stream);
+    fclose($stream);
+
+    expect($built)->toContain(chunk_split(base64_encode($contents), 76, "\r\n"));
+
+    unlink($path);
+});
+
+it('selects the streamed upload only above the attachment threshold', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'test_token',
+        'refresh_token' => 'dummy_refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'https://www.googleapis.com/auth/gmail.send',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ]);
+
+    $small = sys_get_temp_dir().'/google-api-small.bin';
+    $large = sys_get_temp_dir().'/google-api-large.bin';
+    file_put_contents($small, str_repeat('a', 1024));
+    file_put_contents($large, str_repeat('a', 6 * 1024 * 1024));
+
+    $usesStreamedUpload = fn ($mail) => (new ReflectionMethod($mail, 'usesStreamedUpload'))->invoke($mail);
+
+    expect($usesStreamedUpload(GoogleApi::gmail()->attachment($small)))->toBeFalse()
+        ->and($usesStreamedUpload(GoogleApi::gmail()->attachment($large)))->toBeTrue();
+
+    unlink($small);
+    unlink($large);
 });
 
 it('supports macros on the manager', function () {
