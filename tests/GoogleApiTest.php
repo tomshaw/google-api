@@ -3,13 +3,17 @@
 declare(strict_types=1);
 
 use Google\Client;
+use Google\Service\Books;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use PHPUnit\Framework\TestCase;
+use TomShaw\GoogleApi\AccessToken;
+use TomShaw\GoogleApi\Exceptions\GoogleClientException;
 use TomShaw\GoogleApi\GoogleApi;
 use TomShaw\GoogleApi\GoogleClient;
 use TomShaw\GoogleApi\Resources\GoogleCalendar;
 use TomShaw\GoogleApi\Resources\GoogleMail;
+use TomShaw\GoogleApi\Storage\DatabaseStorageAdapter;
 use TomShaw\GoogleApi\Storage\SessionStorageAdapter;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
 
@@ -38,17 +42,18 @@ afterEach(function () {
 it('returns null when no access token is set', function () {
     $this->client->deleteAccessToken();
 
-    $result = $this->client->getAccessToken();
-
-    expect($result->isEmpty())->toBeTrue();
+    expect($this->client->getAccessToken())->toBeNull()
+        ->and($this->client->isEmpty())->toBeTrue();
 });
 
 it('returns access token when token is set', function () {
     $this->client->setAccessToken(['access_token' => 'test_token']);
 
-    $result = $this->client->getAccessToken()->toArray();
+    $result = $this->client->getAccessToken();
 
-    expect($result)->toBeArray()->and($result['access_token'])->toBe('test_token');
+    expect($result)->toBeInstanceOf(AccessToken::class)
+        ->and($result->accessToken)->toBe('test_token')
+        ->and($result->toArray())->toBe(['access_token' => 'test_token']);
 });
 
 it('sets and gets the storage adapter correctly', function () {
@@ -91,4 +96,82 @@ it('returns GoogleCalendar instance', function () {
     $result = GoogleApi::calendar();
 
     expect($result)->toBeInstanceOf(GoogleCalendar::class);
+});
+
+it('builds an access token from an array and back', function () {
+    $token = AccessToken::fromArray([
+        'access_token' => 'abc',
+        'refresh_token' => 'def',
+        'expires_in' => '3600',
+        'scope' => 'scope',
+        'token_type' => 'Bearer',
+        'created' => 100,
+    ]);
+
+    expect($token->expiresIn)->toBe(3600)
+        ->and($token->created)->toBe(100)
+        ->and($token->hasRefreshToken())->toBeTrue()
+        ->and($token->toArray())->toBe([
+            'access_token' => 'abc',
+            'refresh_token' => 'def',
+            'expires_in' => 3600,
+            'scope' => 'scope',
+            'token_type' => 'Bearer',
+            'created' => 100,
+        ]);
+});
+
+it('detects access token expiry', function () {
+    $expired = new AccessToken(accessToken: 'abc', expiresIn: 3600, created: time() - 7200);
+    $active = new AccessToken(accessToken: 'abc', expiresIn: 3600, created: time());
+    $unknown = new AccessToken(accessToken: 'abc');
+
+    expect($expired->isExpired())->toBeTrue()
+        ->and($active->isExpired())->toBeFalse()
+        ->and($unknown->isExpired())->toBeTrue()
+        ->and($unknown->hasRefreshToken())->toBeFalse();
+});
+
+it('returns any google service instance via the manager', function () {
+    Session::put(SessionStorageAdapter::SESSION_KEY, [
+        'access_token' => 'test_token',
+        'refresh_token' => 'dummy_refresh_token',
+        'expires_in' => 3600,
+        'scope' => 'https://www.googleapis.com/auth/books',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ]);
+
+    $result = GoogleApi::service(Books::class);
+
+    expect($result)->toBeInstanceOf(Books::class);
+});
+
+it('throws when the storage adapter does not support user scoping', function () {
+    $this->client->forUser(1);
+})->throws(GoogleClientException::class, 'does not support user scoping');
+
+it('scopes the database storage adapter to a given user', function () {
+    config()->set('database.connections.testing.foreign_key_constraints', false);
+
+    $this->artisan('migrate', ['--database' => 'testing'])->run();
+
+    $token = [
+        'access_token' => 'user-42-token',
+        'refresh_token' => 'refresh',
+        'expires_in' => 3600,
+        'scope' => 'scope',
+        'token_type' => 'Bearer',
+        'created' => time(),
+    ];
+
+    (new DatabaseStorageAdapter)->forUser(42)->set($token);
+
+    expect((new DatabaseStorageAdapter)->forUser(7)->get())->toBeNull();
+
+    $stored = (new DatabaseStorageAdapter)->forUser(42)->get();
+
+    expect($stored)->not->toBeNull()
+        ->and($stored->access_token)->toBe('user-42-token')
+        ->and($stored->expires_in)->toBe(3600);
 });

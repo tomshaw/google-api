@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace TomShaw\GoogleApi;
 
+use BackedEnum;
 use Google\Client;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator;
 use TomShaw\GoogleApi\Exceptions\GoogleClientException;
 use TomShaw\GoogleApi\Http\Resources\AccessTokenResource;
-use TomShaw\GoogleApi\Models\StorageCollection;
 use TomShaw\GoogleApi\Storage\StorageAdapterInterface;
+use TomShaw\GoogleApi\Storage\UserScopedStorageAdapter;
 
 class GoogleClient
 {
@@ -37,11 +40,11 @@ class GoogleClient
 
         $client->setApplicationName(config('google-api.application_name'));
 
-        $client->setPrompt(config('google-api.prompt'));
+        $client->setPrompt(self::configString('google-api.prompt'));
 
-        $client->setApprovalPrompt(config('google-api.approval_prompt'));
+        $client->setApprovalPrompt(self::configString('google-api.approval_prompt'));
 
-        $client->setAccessType(config('google-api.access_type'));
+        $client->setAccessType(self::configString('google-api.access_type'));
 
         $client->setIncludeGrantedScopes(config('google-api.include_grant_scopes'));
 
@@ -52,7 +55,7 @@ class GoogleClient
     {
         $accessToken = $this->getAccessToken();
 
-        if ($accessToken->isEmpty()) {
+        if ($accessToken === null) {
             $this->createAuthUrl();
 
             return null;
@@ -87,16 +90,30 @@ class GoogleClient
         return $this->storageAdapter;
     }
 
-    public function getAccessToken(): StorageCollection
+    public function getAccessToken(): ?AccessToken
     {
-        return new StorageCollection($this->getStorage()->get());
+        $stored = $this->getStorage()->get();
+
+        if ($stored instanceof Arrayable) {
+            $stored = $stored->toArray();
+        }
+
+        if (! is_array($stored) || $stored === []) {
+            return null;
+        }
+
+        return AccessToken::fromArray($stored);
     }
 
     /**
-     * @param  array<string, mixed>  $accessToken
+     * @param  AccessToken|array<string, mixed>  $accessToken
      */
-    public function setAccessToken(array $accessToken): self
+    public function setAccessToken(AccessToken|array $accessToken): self
     {
+        if ($accessToken instanceof AccessToken) {
+            $accessToken = $accessToken->toArray();
+        }
+
         $this->storageAdapter->set($accessToken);
 
         return $this;
@@ -109,12 +126,30 @@ class GoogleClient
 
     public function isEmpty(): bool
     {
-        return $this->getAccessToken()->isEmpty();
+        return $this->getAccessToken() === null;
     }
 
     public function isNotEmpty(): bool
     {
-        return $this->getAccessToken()->isNotEmpty();
+        return ! $this->isEmpty();
+    }
+
+    /**
+     * Return a client whose token storage is scoped to the given user.
+     */
+    public function forUser(Authenticatable|int|string $user): static
+    {
+        $storage = $this->getStorage();
+
+        if (! $storage instanceof UserScopedStorageAdapter) {
+            throw new GoogleClientException(sprintf('The [%s] storage adapter does not support user scoping.', $storage::class));
+        }
+
+        $clone = clone $this;
+        $clone->client = clone $this->client;
+        $clone->storageAdapter = (clone $storage)->forUser($user);
+
+        return $clone;
     }
 
     public function createAuthUrl(): void
@@ -168,5 +203,12 @@ class GoogleClient
         }
 
         return $validator->validated();
+    }
+
+    private static function configString(string $key): string
+    {
+        $value = config($key);
+
+        return $value instanceof BackedEnum ? (string) $value->value : $value;
     }
 }

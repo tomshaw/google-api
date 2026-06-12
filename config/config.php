@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use TomShaw\GoogleApi\Enums\AccessType;
+use TomShaw\GoogleApi\Enums\ApprovalPrompt;
+use TomShaw\GoogleApi\Enums\Prompt;
 use TomShaw\GoogleApi\Storage\DatabaseStorageAdapter;
 
 return [
@@ -30,19 +33,19 @@ return [
      * {@code "none"} Do not display any authentication or consent screens. Must not be specified with other values.
      * {@code "consent"} Prompt the user for consent. {@code "select_account"} Prompt the user to select an account.
      */
-    'prompt' => 'consent',
+    'prompt' => Prompt::Consent,
 
     /**
      * Possible values for approval_prompt include: {@code "force"} to force the approval UI to appear.
      * {@code "auto"} to request auto-approval when possible. (This is the default value)
      */
-    'approval_prompt' => 'auto',
+    'approval_prompt' => ApprovalPrompt::Auto,
 
     /**
      * Possible values for access_type include: {@code "offline"} to request offline access from the user.
      * {@code "online"} to request online access from the user.
      */
-    'access_type' => 'offline',
+    'access_type' => AccessType::Offline,
 
     /**
      * If this is provided with the value true, and the authorization request is granted, the authorization
