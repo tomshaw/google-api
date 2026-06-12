@@ -19,7 +19,7 @@ class GoogleApiServiceProvider extends ServiceProvider
         }
     }
 
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'google-api');
 

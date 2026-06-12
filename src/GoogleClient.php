@@ -15,7 +15,8 @@ class GoogleClient
 {
     protected StorageAdapterInterface $storageAdapter;
 
-    public static $rules = [
+    /** @var array<string, string> */
+    public static array $rules = [
         'access_token' => 'required|string',
         'refresh_token' => 'required|string',
         'expires_in' => 'required|numeric',
@@ -67,11 +68,9 @@ class GoogleClient
         if ($this->client->isAccessTokenExpired()) {
             $accessToken = $this->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
 
-            if (is_array($accessToken)) {
-                $this->client->setAccessToken($accessToken);
+            $this->client->setAccessToken($accessToken);
 
-                $this->setAccessToken($accessToken);
-            }
+            $this->setAccessToken($accessToken);
         }
 
         return $this->client;
@@ -123,7 +122,7 @@ class GoogleClient
         exit;
     }
 
-    public function fetchAccessTokenWithRefreshToken($refreshToken): array|bool
+    public function fetchAccessTokenWithRefreshToken(?string $refreshToken): array
     {
         $response = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
 
@@ -136,7 +135,7 @@ class GoogleClient
         return $this->validate($resource['access_token'], $resource['refresh_token'], $resource['expires_in'], $resource['scope'], $resource['token_type'], $resource['created']);
     }
 
-    public function fetchAccessTokenWithAuthCode($authCode): array|bool
+    public function fetchAccessTokenWithAuthCode(string $authCode): array
     {
         $response = $this->client->fetchAccessTokenWithAuthCode($authCode);
 

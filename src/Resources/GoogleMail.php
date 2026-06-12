@@ -15,21 +15,21 @@ final class GoogleMail
 {
     protected Gmail $service;
 
-    protected ?string $toName;
+    protected ?string $toName = null;
 
-    protected ?string $toEmail;
+    protected ?string $toEmail = null;
 
     protected array $cc = [];
 
     protected array $bCC = [];
 
-    protected ?string $fromName;
+    protected ?string $fromName = null;
 
-    protected ?string $fromEmail;
+    protected ?string $fromEmail = null;
 
-    protected ?string $subject;
+    protected ?string $subject = null;
 
-    protected ?string $message;
+    protected ?string $message = null;
 
     protected array $attachments = [];
 
@@ -54,9 +54,9 @@ final class GoogleMail
     /**
      * Gets the 'to' name.
      *
-     * @return string The 'to' name.
+     * @return string|null The 'to' name.
      */
-    public function getToName(): string
+    public function getToName(): ?string
     {
         return $this->toName;
     }
@@ -77,9 +77,9 @@ final class GoogleMail
     /**
      * Gets the 'to' email.
      *
-     * @return string The 'to' email.
+     * @return string|null The 'to' email.
      */
-    public function getToEmail(): string
+    public function getToEmail(): ?string
     {
         return $this->toEmail;
     }
@@ -146,9 +146,9 @@ final class GoogleMail
     /**
      * Gets the 'from' name.
      *
-     * @return string The 'from' name.
+     * @return string|null The 'from' name.
      */
-    public function getFromName(): string
+    public function getFromName(): ?string
     {
         return $this->fromName;
     }
@@ -169,9 +169,9 @@ final class GoogleMail
     /**
      * Gets the 'from' email.
      *
-     * @return string The 'from' email.
+     * @return string|null The 'from' email.
      */
-    public function getFromEmail(): string
+    public function getFromEmail(): ?string
     {
         return $this->fromEmail;
     }
@@ -192,9 +192,9 @@ final class GoogleMail
     /**
      * Gets the subject of the email.
      *
-     * @return string The subject of the email.
+     * @return string|null The subject of the email.
      */
-    public function getSubject(): string
+    public function getSubject(): ?string
     {
         return $this->subject;
     }
@@ -215,9 +215,9 @@ final class GoogleMail
     /**
      * Gets the message of the email.
      *
-     * @return string The message of the email.
+     * @return string|null The message of the email.
      */
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
@@ -289,10 +289,10 @@ final class GoogleMail
     /**
      * Sets the subject of the email.
      *
-     * @param  mixed  $subject  The subject to set.
+     * @param  string  $subject  The subject to set.
      * @return GoogleMail The current instance.
      */
-    public function subject($subject): GoogleMail
+    public function subject(string $subject): GoogleMail
     {
         $this->setSubject($subject);
 
@@ -302,10 +302,10 @@ final class GoogleMail
     /**
      * Sets the message of the email.
      *
-     * @param  mixed  $message  The message to set.
+     * @param  string  $message  The message to set.
      * @return GoogleMail The current instance.
      */
-    public function message($message): GoogleMail
+    public function message(string $message): GoogleMail
     {
         $this->setMessage($message);
 
@@ -382,7 +382,7 @@ final class GoogleMail
      */
     protected function buildMessage(array $validated): string
     {
-        $boundary = md5(time());
+        $boundary = md5((string) time());
 
         $headers = "From: {$validated['fromName']} <{$validated['fromEmail']}>\r\n";
         $headers .= "To: {$validated['toName']} <{$validated['toEmail']}>\r\n";
