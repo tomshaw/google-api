@@ -1,10 +1,10 @@
 # GoogleApi ☁️
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tomshaw/google-api/run-tests.yml?branch=master&style=flat-square&label=tests)
-![issues](https://img.shields.io/github/issues/tomshaw/google-api?style=flat&logo=appveyor)
-![forks](https://img.shields.io/github/forks/tomshaw/google-api?style=flat&logo=appveyor)
-![stars](https://img.shields.io/github/stars/tomshaw/google-api?style=flat&logo=appveyor)
-[![GitHub license](https://img.shields.io/github/license/tomshaw/google-api)](https://github.com/tomshaw/google-api/blob/master/LICENSE)
+[![tests](https://github.com/tomshaw/google-api/actions/workflows/run-tests.yml/badge.svg?branch=master)](https://github.com/tomshaw/google-api/actions/workflows/run-tests.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/tomshaw/google-api?style=flat&cacheSeconds=3600)](https://packagist.org/packages/tomshaw/google-api)
+[![Total Downloads](https://img.shields.io/packagist/dt/tomshaw/google-api?style=flat&cacheSeconds=3600)](https://packagist.org/packages/tomshaw/google-api)
+[![PHP Version](https://img.shields.io/packagist/dependency-v/tomshaw/google-api/php?style=flat&cacheSeconds=3600)](https://packagist.org/packages/tomshaw/google-api)
+[![License](https://img.shields.io/packagist/l/tomshaw/google-api?style=flat&cacheSeconds=3600)](https://github.com/tomshaw/google-api/blob/master/LICENSE)
 
 A Google OAuth 2.0 Laravel Service Client.
 
