@@ -2,6 +2,13 @@
 
 All notable changes to `google-api` will be documented in this file
 
+## [0.14.1](https://github.com/tomshaw/google-api/compare/v0.14.0...v0.14.1) (2026-06-13)
+
+
+### Bug Fixes
+
+* update README badges for consistency and clarity ([ef40228](https://github.com/tomshaw/google-api/commit/ef402288b888d123c6485c349ff171e84395c7d0))
+
 ## [0.14.0](https://github.com/tomshaw/google-api/compare/v0.13.0...v0.14.0) (2026-06-12)
 
 
